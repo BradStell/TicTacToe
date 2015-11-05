@@ -12,7 +12,11 @@ import javafx.scene.shape.Rectangle;
  */
 public class GridSquare extends StackPane {
 
-    public GridSquare(double squareWidth, double squareHeight, GridPane parent) {
+    private int col;
+    private int row;
+    private char contains;  // 'e' if empty, 'x' if x, 'o' if o
+
+    public GridSquare(double squareWidth, double squareHeight, GridPane parent, int row, int col) {
 
         Rectangle rect = new Rectangle(squareWidth, squareHeight);
         rect.setFill(null);
@@ -24,7 +28,24 @@ public class GridSquare extends StackPane {
         setAlignment(Pos.CENTER);
         getChildren().addAll(rect);
 
+        this.col = col;
+        this.row = row;
     }
 
+    public int getCol() {
+        return col;
+    }
+
+    public int getRow() {
+        return row;
+    }
+
+    public void setContains(char contains) {
+        this.contains = contains;
+    }
+
+    public char getContains() {
+        return contains;
+    }
 
 }
