@@ -11,6 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 /**
@@ -27,10 +28,15 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("MainView.fxml"));
         primaryStage.setTitle("Tic Tac Toe");
-        primaryStage.setScene(new Scene(root));
+        Scene scene = new Scene(root);
+        scene.getStylesheets().add("/brad/style.css");
+        primaryStage.setScene(scene);
         primaryStage.show();
 
         buildGameBoard(root);
+
+        System.out.print(Font.getFamilies() + "\n");
+        System.out.print(Font.getFontNames());
     }
 
     private void buildGameBoard(Parent root) {
