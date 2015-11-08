@@ -11,7 +11,6 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 /**
@@ -20,8 +19,9 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
-    public Image X_IMAGE = new Image(String.valueOf(getClass().getResource("/resources/images/x-red.png")));
-    public Image O_IMAGE = new Image(String.valueOf(getClass().getResource("/resources/images/o-neon-green.png")));
+    private final Image X_IMAGE = new Image(String.valueOf(getClass().getResource("/resources/images/x-red.png")));
+    private final Image O_IMAGE = new Image(String.valueOf(getClass().getResource("/resources/images/o-neon-green.png")));
+    private GridPane gameBoard;
 
 
     @Override
@@ -34,13 +34,11 @@ public class Main extends Application {
         primaryStage.show();
 
         buildGameBoard(root);
-
-        MiniMax.Start();
     }
 
     private void buildGameBoard(Parent root) {
 
-        GridPane gameBoard = new GridPane();
+        gameBoard = new GridPane();
         AnchorPane mainAnchor = (AnchorPane) root.lookup("#mainAnchor");
 
         // Set Grid Pane Column and Row constraints
@@ -56,6 +54,7 @@ public class Main extends Application {
                 // and horizontally with an expanding window frame
                 GridSquare square = new GridSquare(mainAnchor.getWidth() / 3, mainAnchor.getHeight() / 3, gameBoard, row, col);
                 square.setContains('e');
+                square.setId("" + row + col);
                 square.setOnMouseClicked(myMouseHandler);
 
                 gameBoard.add(square, col, row);
@@ -93,8 +92,6 @@ public class Main extends Application {
         Object source = event.getSource();
         GridSquare square = (GridSquare) source;
 
-        System.out.print("Contains an " + square.getContains() + "\n");
-
         if (square.getContains() == 'e' && square.getContains() != 'o') {
 
             square.setContains('x');
@@ -105,6 +102,8 @@ public class Main extends Application {
             imageView.fitHeightProperty().bind(square.heightProperty().subtract(square.heightProperty().divide(4)));
 
             square.getChildren().add(imageView);
+
+            MiniMax.Start(gameBoard, 3);
         }
         else
             System.out.print("Already has an x\n");
