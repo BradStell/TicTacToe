@@ -35,8 +35,7 @@ public class Main extends Application {
 
         buildGameBoard(root);
 
-        System.out.print(Font.getFamilies() + "\n");
-        System.out.print(Font.getFontNames());
+        MiniMax.Start();
     }
 
     private void buildGameBoard(Parent root) {
