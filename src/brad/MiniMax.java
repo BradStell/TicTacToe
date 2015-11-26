@@ -7,39 +7,36 @@ import javafx.scene.layout.GridPane;
  */
 public class MiniMax {
 
-    //private static char[][] state;
+    static final char MAX = 'x';
+    static final char MIN = 'o';
 
     public static void Start(GridPane gameBoard, int size) {
 
-        char[][] state = new char[3][3];
+        char[][] board = new char[3][3];
 
         // Convert gameBoard into 2D array we can work with easier
         for (int row = 0; row < size; row++) {
             for (int col = 0; col < size; col++) {
                 GridSquare square = (GridSquare) gameBoard.lookup("#" + row + col);
-                state[row][col] = square.getContains();
+                board[row][col] = square.getContains();
             }
         }
 
         // Call minimax with the state
-        MiniMax(state);
+        State state = new State(board, MIN);
+        MiniMax_AlphaBetaPruning(state);
     }
 
-    private static void MiniMax(char[][] state) {
+    private static void MiniMax_AlphaBetaPruning(State state) {
 
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                System.out.print(state[i][j] + " ");
-            }
-            System.out.print("\n");
-        }
+        int sigma = MaxValue(state, Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
 
-    private static void MaxValue() {
+    private static int MaxValue(State state, int alpha, int beta) {
 
     }
 
-    private static void MinValue() {
+    private static int MinValue(State state, int alpha, int beta) {
 
     }
 

@@ -21,6 +21,8 @@ public class Main extends Application {
 
     private final Image X_IMAGE = new Image(String.valueOf(getClass().getResource("/resources/images/x-red.png")));
     private final Image O_IMAGE = new Image(String.valueOf(getClass().getResource("/resources/images/o-neon-green.png")));
+    private final Image PLAYER = X_IMAGE;
+    private final Image CPU = O_IMAGE;
     private GridPane gameBoard;
 
 
