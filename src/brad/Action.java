@@ -23,25 +23,4 @@ public class Action {
     public void setCol(int col) {
         this.col = col;
     }
-
-    public static Action[] generateActions(State state) {
-
-        Action[] actions = new Action[state.getNumChildren()];
-
-        if (state.getWho() == MiniMax.MIN) {
-            actions = generateMinActions();
-        } else if (state.getWho() == MiniMax.MAX) {
-            actions = generateMaxActions();
-        }
-
-        return actions;
-    }
-
-    private static Action[] generateMinActions() {
-
-    }
-
-    private static Action[] generateMaxActions() {
-
-    }
 }
