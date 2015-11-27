@@ -30,6 +30,7 @@ public class MiniMax {
     private static void MiniMax_AlphaBetaPruning(State state) {
 
         int sigma = MinValue(state, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        System.out.print("Sigma = " + sigma + "\n");
     }
 
     private static int MaxValue(State state, int alpha, int beta) {
@@ -105,22 +106,89 @@ public class MiniMax {
     private static int utility(State state) {
 
         int utility = 0;
+        int xcount = 0;
+        int ocount = 0;
+        char[][] board = state.getBoard();
 
-        if (state.getWhosTurn() == MiniMax.MIN) {
-            utility = calcMinUtility();
-        } else if (state.getWhosTurn() == MiniMax.MAX) {
-            utility = calcMaxUtility();
+        // Check for a winner, either x's or o's
+
+        // Check for vertical winner
+        for (int row = 0; row < 3; row++) {
+            xcount = 0;
+            ocount = 0;
+
+            for (int col = 0; col < 3; col++) {
+                if (board[col][row] == 'x') {
+                    xcount++;
+                } else if (board[col][row] == 'o') {
+                    ocount++;
+                }
+            }
+
+            if (xcount == 3) {
+                return 1;
+            } else if (ocount == 3) {
+                return -1;
+            }
+        }
+
+        // Check for horizontal winner
+        for (int row = 0; row < 3; row++) {
+            xcount = 0;
+            ocount = 0;
+
+            for (int col = 0; col < 3; col++) {
+                if (board[row][col] == 'x') {
+                    xcount++;
+                } else if (board[row][col] == 'o') {
+                    ocount++;
+                }
+            }
+
+            if (xcount == 3) {
+                return 1;
+            } else if (ocount == 3) {
+                return -1;
+            }
+        }
+
+        // Check for diagonal winner
+        xcount = 0;
+        ocount = 0;
+        for (int row = 0; row < 3; row++) {
+            if (board[row][row] == 'x') {
+                xcount++;
+            } else if (board[row][row] == 'o') {
+                ocount++;
+            }
+        }
+
+        if (xcount == 3) {
+            return 1;
+        } else if (ocount == 3) {
+            return -1;
+        }
+
+        xcount = 0;
+        ocount = 0;
+        int row = 0, col = 2;
+        for (int i = 0; i < 3; i++) {
+            if (board[row][col] == 'x') {
+                xcount++;
+            } else if (board[row][col] == 'o') {
+                ocount++;
+            }
+            row++;
+            col--;
+        }
+
+        if (xcount == 3) {
+            return 1;
+        } else if (ocount == 3) {
+            return -1;
         }
 
         return utility;
-    }
-
-    private static int calcMinUtility() {
-
-    }
-
-    private static int calcMaxUtility() {
-
     }
 
     private static int Max(int sigma, int minimaxValue) {
@@ -187,7 +255,11 @@ public class MiniMax {
 
         state.addChild(child);
 
-        return child;
+        if (child == null) {
+            return state;
+        } else {
+            return child;
+        }
     }
 
 }
