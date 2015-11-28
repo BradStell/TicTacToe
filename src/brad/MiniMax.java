@@ -65,33 +65,15 @@ public class MiniMax {
 
         int sigma = MinValue(state, Integer.MIN_VALUE, Integer.MAX_VALUE, depth);
 
-        System.out.print("Sigma = " + sigma + "\n");
-
-        int min = Integer.MAX_VALUE;
-        Action action = null;
-        for (int i = 0; i < state.getNumChildren(); i++) {
-            System.out.print(state.getChild(i).getUtilityValue() + " ");
-            if (state.getChild(i).getUtilityValue() < min) {
-                min = state.getChild(i).getUtilityValue();
-                action = state.getChild(i).getAction();
-            }
-        }
-
-
-        /*System.out.print("Sigma = " + sigma + "\n");
-
-        for (int i = 0; i < state.getNumChildren(); i++) {
-            System.out.print(state.getChild(i).getUtilityValue() + " ");
-        }
         Action action = null;
 
         for (int i = 0; i < state.getNumChildren(); i++) {
             if (state.getChild(i).getUtilityValue() == sigma) {
                 action = state.getChild(i).getAction();
-                System.out.print("Row = " + state.getChild(i).getAction().getRow() + " Col = " + state.getChild(i).getAction().getCol() + "\n\n");
+                //System.out.print("Row = " + state.getChild(i).getAction().getRow() + " Col = " + state.getChild(i).getAction().getCol() + "\n\n");
                 break;
             }
-        }*/
+        }
 
         return action;
     }
@@ -101,7 +83,7 @@ public class MiniMax {
         if (terminalTest(state)) {
             return utility(state, depth);
         }
-
+        
         state.setUtilityValue(Integer.MIN_VALUE);
 
         for (int i = 0; i < state.getNumChildren(); i++) {
@@ -189,9 +171,9 @@ public class MiniMax {
             }
 
             if (xcount == 3) {
-                return 10 + depth;
+                return 10 - depth;
             } else if (ocount == 3) {
-                return -10 - depth;
+                return depth - 10;
             }
         }
 
@@ -213,9 +195,9 @@ public class MiniMax {
             }
 
             if (xcount == 3) {
-                return 10 + depth;
+                return 10 - depth;
             } else if (ocount == 3) {
-                return -10 - depth;
+                return depth - 10;
             }
         }
 
@@ -231,9 +213,9 @@ public class MiniMax {
         }
 
         if (xcount == 3) {
-            return 10 + depth;
+            return 10 - depth;
         } else if (ocount == 3) {
-            return -10 - depth;
+            return depth - 10;
         }
 
         xcount = 0;
@@ -250,9 +232,9 @@ public class MiniMax {
         }
 
         if (xcount == 3) {
-            return 10 + depth;
+            return 10 - depth;
         } else if (ocount == 3) {
-            return -10 - depth;
+            return depth - 10;
         }
 
         return score;
