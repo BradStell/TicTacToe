@@ -42,7 +42,7 @@
                               <HBox alignment="CENTER_RIGHT" maxWidth="Infinity" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                                  <children>
                                     <Label text="You :" />
-                                    <Label text="Label" />
+                                    <Label fx:id="yourScore" text="0" />
                                  </children>
                                  <padding>
                                     <Insets right="30.0" />
@@ -51,7 +51,7 @@
                               <HBox alignment="CENTER_LEFT" maxWidth="Infinity" prefHeight="100.0" prefWidth="200.0" spacing="10.0" GridPane.columnIndex="1">
                                  <children>
                                     <Label text="CPU :" />
-                                    <Label text="Label" />
+                                    <Label fx:id="cpuScore" text="0" />
                                  </children>
                                  <padding>
                                     <Insets left="30.0" />

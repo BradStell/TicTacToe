@@ -8,6 +8,7 @@ import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
@@ -23,7 +24,10 @@ public class Main extends Application {
     private final Image O_IMAGE = new Image(String.valueOf(getClass().getResource("/resources/images/o-neon-green.png")));
     public final Image PLAYER = X_IMAGE;
     public final Image CPU = O_IMAGE;
-    private GridPane gameBoard;
+    private static GridPane gameBoard;
+    private static int playerScore = 0;
+    private static int cpuScore = 0;
+    AnchorPane bottomAnchor;
 
 
     @Override
@@ -42,6 +46,7 @@ public class Main extends Application {
 
         gameBoard = new GridPane();
         AnchorPane mainAnchor = (AnchorPane) root.lookup("#mainAnchor");
+        bottomAnchor = (AnchorPane) root.lookup("#bottomAnchor");
 
         // Set Grid Pane Column and Row constraints
         setGridPaneConstraines(gameBoard, mainAnchor);
@@ -99,18 +104,169 @@ public class Main extends Application {
             square.setContains('x');
 
             MyImageView imageView = new MyImageView();
+            imageView.setId("image");
             imageView.setImage(X_IMAGE);
             imageView.fitWidthProperty().bind(square.widthProperty().subtract(square.widthProperty().divide(4)));
             imageView.fitHeightProperty().bind(square.heightProperty().subtract(square.heightProperty().divide(4)));
 
             square.getChildren().add(imageView);
 
-            MiniMax.Start(gameBoard, 3, PLAYER, CPU);
+            if (!terminalState()) {
+                MiniMax.Start(gameBoard, 3, PLAYER, CPU);
+            } else {
+
+                Label cpu = (Label) bottomAnchor.lookup("#cpuScore");
+                Label player = (Label) bottomAnchor.lookup("#yourScore");
+
+                int who_won = whoWon();
+
+                if (who_won == 1) {
+                    player.setText(++playerScore + "");
+                } else if (who_won == -1) {
+                    cpu.setText(++cpuScore + "");
+                }
+
+                removeChildren();
+
+            }
         }
         else
             System.out.print("Already has an x\n");
 
     };
+
+    private static void removeChildren() {
+
+        // Convert gameBoard into 2D array we can work with easier
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 3; col++) {
+                GridSquare square = (GridSquare) gameBoard.lookup("#" + row + col);
+                square.getChildren().remove(gameBoard.lookup("#image"));
+                square.setContains('e');
+            }
+        }
+
+    }
+
+    private static int whoWon() {
+
+        char[][] board = new char[3][3];
+
+        // Convert gameBoard into 2D array we can work with easier
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 3; col++) {
+                GridSquare square = (GridSquare) gameBoard.lookup("#" + row + col);
+                board[row][col] = square.getContains();
+            }
+        }
+
+        // Check for a winner, either x's or o's
+
+        int xcount;
+        int ocount;
+
+        // Check Vertical Winner
+        for (int row = 0; row < 3; row++) {
+            xcount = 0;
+            ocount = 0;
+
+            for (int col = 0; col < 3; col++) {
+                if (board[col][row] == 'x') {
+                    xcount++;
+                } else if (board[col][row] == 'o') {
+                    ocount++;
+                }
+            }
+
+            if (xcount == 3) {
+                return 1;
+            } else if (ocount == 3) {
+                return -1;
+            }
+        }
+
+
+        xcount = 0;
+        ocount = 0;
+        for (int row = 0; row < 3; row++) {
+            xcount = 0;
+            ocount = 0;
+
+            for (int col = 0; col < 3; col++) {
+                if (board[row][col] == 'x') {
+                    xcount++;
+                } else if (board[row][col] == 'o') {
+                    ocount++;
+                }
+            }
+
+            if (xcount == 3) {
+                return 1;
+            } else if (ocount == 3) {
+                return -1;
+            }
+        }
+
+        xcount = 0;
+        ocount = 0;
+        for (int row = 0; row < 3; row++) {
+            if (board[row][row] == 'x') {
+                xcount++;
+            } else if (board[row][row] == 'o') {
+                ocount++;
+            }
+        }
+
+        if (xcount == 3) {
+            return 1;
+        } else if (ocount == 3) {
+            return -1;
+        }
+
+        xcount = 0;
+        ocount = 0;
+        int row = 0, col = 2;
+        for (int i = 0; i < 3; i++) {
+            if (board[row][col] == 'x') {
+                xcount++;
+            } else if (board[row][col] == 'o') {
+                ocount++;
+            }
+            row++;
+            col--;
+        }
+
+        if (xcount == 3) {
+            return 1;
+        } else if (ocount == 3) {
+            return -1;
+        }
+
+        return 0;
+    }
+
+    private static boolean terminalState() {
+
+        boolean terminalState = false;
+
+        // Convert gameBoard into 2D array we can work with easier
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 3; col++) {
+                GridSquare square = (GridSquare) gameBoard.lookup("#" + row + col);
+                if (square.getContains() == 'e') {
+                    return false;
+                }
+            }
+        }
+
+        int winner = whoWon();
+
+        if (winner == 1 || winner == -1 || winner == 0) {
+            return true;
+        }
+
+        return terminalState;
+    }
 
     public static void main(String[] args) {
         launch(args);
