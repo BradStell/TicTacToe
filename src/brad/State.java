@@ -36,6 +36,14 @@ public class State {
         children.add(child);
     }
 
+    public int getNumChildArray() {
+        return children.size();
+    }
+
+    public State getChild(int i) {
+        return children.get(i);
+    }
+
     public int getUtilityValue() {
         return utilityValue;
     }

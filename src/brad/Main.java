@@ -21,8 +21,8 @@ public class Main extends Application {
 
     private final Image X_IMAGE = new Image(String.valueOf(getClass().getResource("/resources/images/x-red.png")));
     private final Image O_IMAGE = new Image(String.valueOf(getClass().getResource("/resources/images/o-neon-green.png")));
-    private final Image PLAYER = X_IMAGE;
-    private final Image CPU = O_IMAGE;
+    public final Image PLAYER = X_IMAGE;
+    public final Image CPU = O_IMAGE;
     private GridPane gameBoard;
 
 
@@ -105,7 +105,7 @@ public class Main extends Application {
 
             square.getChildren().add(imageView);
 
-            MiniMax.Start(gameBoard, 3);
+            MiniMax.Start(gameBoard, 3, PLAYER, CPU);
         }
         else
             System.out.print("Already has an x\n");

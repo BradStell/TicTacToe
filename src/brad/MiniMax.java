@@ -1,5 +1,6 @@
 package brad;
 
+import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 
 /**
@@ -9,8 +10,13 @@ public class MiniMax {
 
     static final char MAX = 'x';
     static final char MIN = 'o';
+    static Image PLAYER;
+    static Image CPU;
 
-    public static void Start(GridPane gameBoard, int size) {
+    public static void Start(GridPane gameBoard, int size, Image player, Image cpu) {
+
+        PLAYER = player;
+        CPU = cpu;
 
         char[][] board = new char[3][3];
 
@@ -19,67 +25,124 @@ public class MiniMax {
             for (int col = 0; col < size; col++) {
                 GridSquare square = (GridSquare) gameBoard.lookup("#" + row + col);
                 board[row][col] = square.getContains();
+                System.out.print(board[row][col] + " ");
             }
+            System.out.print("\n");
         }
+        System.out.print("\n");
 
         // Call minimax with the state
         State state = new State(board, MIN);
-        MiniMax_AlphaBetaPruning(state);
-    }
+        Action action = MiniMax_AlphaBetaPruning(state, 0);
 
-    private static void MiniMax_AlphaBetaPruning(State state) {
+        int row = action.getRow();
+        int col = action.getCol();
+        GridSquare gridSquare = (GridSquare) gameBoard.lookup("#" + row + col);
 
-        int sigma = MinValue(state, Integer.MIN_VALUE, Integer.MAX_VALUE);
-        System.out.print("Sigma = " + sigma + "\n");
-    }
+        MyImageView imageView = new MyImageView();
 
-    private static int MaxValue(State state, int alpha, int beta) {
+        if (action.getImage() == 'x') {
 
-        if (terminalTest(state)) {
-            return utility(state);
+            imageView.setImage(PLAYER);
+            gridSquare.setContains('x');
+
+        } else if (action.getImage() == 'o') {
+
+            imageView.setImage(CPU);
+            gridSquare.setContains('o');
+
         }
 
-        int sigma = Integer.MIN_VALUE;
+        GridSquare square = (GridSquare) gameBoard.lookup("#" + row + col);
+
+        imageView.fitWidthProperty().bind(square.widthProperty().subtract(square.widthProperty().divide(4)));
+        imageView.fitHeightProperty().bind(square.heightProperty().subtract(square.heightProperty().divide(4)));
+
+        square.getChildren().add(imageView);
+    }
+
+    private static Action MiniMax_AlphaBetaPruning(State state, int depth) {
+
+        int sigma = MinValue(state, Integer.MIN_VALUE, Integer.MAX_VALUE, depth);
+
+        System.out.print("Sigma = " + sigma + "\n");
+
+        int min = Integer.MAX_VALUE;
+        Action action = null;
+        for (int i = 0; i < state.getNumChildren(); i++) {
+            System.out.print(state.getChild(i).getUtilityValue() + " ");
+            if (state.getChild(i).getUtilityValue() < min) {
+                min = state.getChild(i).getUtilityValue();
+                action = state.getChild(i).getAction();
+            }
+        }
+
+
+        /*System.out.print("Sigma = " + sigma + "\n");
+
+        for (int i = 0; i < state.getNumChildren(); i++) {
+            System.out.print(state.getChild(i).getUtilityValue() + " ");
+        }
+        Action action = null;
+
+        for (int i = 0; i < state.getNumChildren(); i++) {
+            if (state.getChild(i).getUtilityValue() == sigma) {
+                action = state.getChild(i).getAction();
+                System.out.print("Row = " + state.getChild(i).getAction().getRow() + " Col = " + state.getChild(i).getAction().getCol() + "\n\n");
+                break;
+            }
+        }*/
+
+        return action;
+    }
+
+    private static int MaxValue(State state, int alpha, int beta, int depth) {
+
+        if (terminalTest(state)) {
+            return utility(state, depth);
+        }
+
+        state.setUtilityValue(Integer.MIN_VALUE);
 
         for (int i = 0; i < state.getNumChildren(); i++) {
 
             State child = getNextAvailableChild(state);
 
-            sigma = Max(sigma, MinValue(child, alpha, beta));
+            state.setUtilityValue(Max(state.getUtilityValue(), MinValue(child, alpha, beta, depth + 1)));
 
-            if (sigma >= beta) {
-                return sigma;
+            if (state.getUtilityValue() >= beta) {
+                return state.getUtilityValue();
             }
 
-            alpha = Max(alpha, sigma);
+            alpha = Max(alpha, state.getUtilityValue());
         }
 
-        return sigma;
+        return state.getUtilityValue();
     }
 
-    private static int MinValue(State state, int alpha, int beta) {
+    private static int MinValue(State state, int alpha, int beta, int depth) {
 
         if (terminalTest(state)) {
-            return utility(state);
+            return utility(state, depth);
         }
 
-        int sigma = Integer.MAX_VALUE;
+        state.setUtilityValue(Integer.MAX_VALUE);
 
         // Generate all children
         for (int i = 0; i < state.getNumChildren(); i++) {
 
             State child = getNextAvailableChild(state);
 
-            sigma = Min(sigma, MaxValue(child, alpha, beta));
+            state.setUtilityValue(Min(state.getUtilityValue(), MaxValue(child, alpha, beta, depth + 1)));
 
-            if (sigma <= alpha) {
-                return sigma;
+            if (state.getUtilityValue() <= alpha) {
+                return state.getUtilityValue();
             }
 
-            beta = Min(beta, sigma);
+            beta = Min(beta, state.getUtilityValue());
         }
 
-        return sigma;
+        return state.getUtilityValue();
     }
 
     private static boolean terminalTest(State state) {
@@ -103,16 +166,16 @@ public class MiniMax {
         return terminalState;
     }
 
-    private static int utility(State state) {
+    private static int utility(State state, int depth) {
 
-        int utility = 0;
-        int xcount = 0;
-        int ocount = 0;
         char[][] board = state.getBoard();
+        int score = 0;
 
         // Check for a winner, either x's or o's
 
-        // Check for vertical winner
+        int xcount;
+        int ocount;
+
         for (int row = 0; row < 3; row++) {
             xcount = 0;
             ocount = 0;
@@ -126,13 +189,17 @@ public class MiniMax {
             }
 
             if (xcount == 3) {
-                return 1;
+                return 10 + depth;
             } else if (ocount == 3) {
-                return -1;
+                return -10 - depth;
             }
         }
 
-        // Check for horizontal winner
+
+        xcount = 0;
+        ocount = 0;
+
+
         for (int row = 0; row < 3; row++) {
             xcount = 0;
             ocount = 0;
@@ -146,15 +213,15 @@ public class MiniMax {
             }
 
             if (xcount == 3) {
-                return 1;
+                return 10 + depth;
             } else if (ocount == 3) {
-                return -1;
+                return -10 - depth;
             }
         }
 
-        // Check for diagonal winner
         xcount = 0;
         ocount = 0;
+
         for (int row = 0; row < 3; row++) {
             if (board[row][row] == 'x') {
                 xcount++;
@@ -164,9 +231,9 @@ public class MiniMax {
         }
 
         if (xcount == 3) {
-            return 1;
+            return 10 + depth;
         } else if (ocount == 3) {
-            return -1;
+            return -10 - depth;
         }
 
         xcount = 0;
@@ -183,12 +250,138 @@ public class MiniMax {
         }
 
         if (xcount == 3) {
-            return 1;
+            return 10 + depth;
         } else if (ocount == 3) {
-            return -1;
+            return -10 - depth;
         }
 
-        return utility;
+        return score;
+
+        /*// Check for vertical winner
+        int verticalScore = checkVerticalScore(board, depth);
+
+        // Check for horizontal winner
+        int horizontalScore = checkHorizontalScore(board, depth);
+
+        // Check for diagonal winner
+        int diagonalScore = checkDiagonalScore(board, depth);
+
+        return Max(verticalScore, horizontalScore, diagonalScore);*/
+    }
+
+    private static int Max(int v, int h, int d) {
+
+        int score = 0;
+
+        if (v > h) {
+            score = v;
+        } else {
+            score = h;
+        }
+
+        if (d > score) {
+            score = d;
+        }
+
+        return score;
+    }
+
+    private static int checkVerticalScore(char[][] board, int depth) {
+
+        int xcount;
+        int ocount;
+        int score = 0;
+
+        for (int row = 0; row < 3; row++) {
+            xcount = 0;
+            ocount = 0;
+
+            for (int col = 0; col < 3; col++) {
+                if (board[col][row] == 'x') {
+                    xcount++;
+                } else if (board[col][row] == 'o') {
+                    ocount++;
+                }
+            }
+
+            if (xcount == 3) {
+                return 10 - depth;
+            } else if (ocount == 3) {
+                return depth - 10;
+            }
+        }
+
+        return score;
+    }
+
+    private static int checkHorizontalScore(char[][] board, int depth) {
+
+        int xcount = 0;
+        int ocount = 0;
+        int score = 0;
+
+        for (int row = 0; row < 3; row++) {
+            xcount = 0;
+            ocount = 0;
+
+            for (int col = 0; col < 3; col++) {
+                if (board[row][col] == 'x') {
+                    xcount++;
+                } else if (board[row][col] == 'o') {
+                    ocount++;
+                }
+            }
+
+            if (xcount == 3) {
+                return 10 - depth;
+            } else if (ocount == 3) {
+                return depth - 10;
+            }
+        }
+
+        return score;
+    }
+
+    private static int checkDiagonalScore(char[][] board, int depth) {
+
+        int xcount = 0;
+        int ocount = 0;
+        int score = 0;
+
+        for (int row = 0; row < 3; row++) {
+            if (board[row][row] == 'x') {
+                xcount++;
+            } else if (board[row][row] == 'o') {
+                ocount++;
+            }
+        }
+
+        if (xcount == 3) {
+            return 10 - depth;
+        } else if (ocount == 3) {
+            return depth - 10;
+        }
+
+        xcount = 0;
+        ocount = 0;
+        int row = 0, col = 2;
+        for (int i = 0; i < 3; i++) {
+            if (board[row][col] == 'x') {
+                xcount++;
+            } else if (board[row][col] == 'o') {
+                ocount++;
+            }
+            row++;
+            col--;
+        }
+
+        if (xcount == 3) {
+            return 10 - depth;
+        } else if (ocount == 3) {
+            return depth - 10;
+        }
+
+        return score;
     }
 
     private static int Max(int sigma, int minimaxValue) {
@@ -211,7 +404,8 @@ public class MiniMax {
 
     private static State getNextAvailableChild(State state) {
 
-        char[][] copyState = state.getBoard();
+        char[][] actualState = state.getBoard();
+        char[][] copyState = state.getBoardCopy();
         State child = null;
         boolean createdChild = false;
         Action action = new Action();
@@ -221,30 +415,43 @@ public class MiniMax {
             for (int col = 0; col < 3; col++) {
 
                 // Find the empty cell
-                if (copyState[row][col] == 'e') {
+                if (actualState[row][col] == 'e') {
 
                     // If its max's turn
                     if (state.getWhosTurn() == MiniMax.MAX) {
 
+                        actualState[row][col] = 'x';
                         copyState[row][col] = 'x';
                         child = new State(copyState, MiniMax.MIN);
                         child.setParent(state);
                         createdChild = true;
+
+                        action.setRow(row);
+                        action.setCol(col);
+                        action.setImage('x');
+                        child.setAction(action);
+
                         break;
                     }
 
                     // If its min's turn
                     else if (state.getWhosTurn() == MiniMax.MIN) {
 
+                        actualState[row][col] = 'o';
                         copyState[row][col] = 'o';
                         child = new State(copyState, MiniMax.MAX);
                         child.setParent(state);
                         createdChild = true;
+
+                        action.setRow(row);
+                        action.setCol(col);
+                        action.setImage('o');
+                        child.setAction(action);
+
                         break;
                     }
-                    action.setRow(row);
-                    action.setCol(col);
-                    child.setAction(action);
+
+
                 }
             }
 
@@ -253,11 +460,12 @@ public class MiniMax {
             }
         }
 
-        state.addChild(child);
+
 
         if (child == null) {
             return state;
         } else {
+            state.addChild(child);
             return child;
         }
     }
