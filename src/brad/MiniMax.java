@@ -15,7 +15,16 @@ public class MiniMax {
     static Image PLAYER;
     static Image CPU;
 
-    public static void Start(GridPane gameBoard, int size, Image player, Image cpu, int depth) {
+    /**
+     * Returns true if the game is over - false if it is not over
+     * @param gameBoard
+     * @param size
+     * @param player
+     * @param cpu
+     * @param depth
+     * @return
+     */
+    public static boolean Start(GridPane gameBoard, int size, Image player, Image cpu, int depth) {
 
         PLAYER = player;
         CPU = cpu;
@@ -70,6 +79,8 @@ public class MiniMax {
         imageView.fitHeightProperty().bind(square.heightProperty().subtract(square.heightProperty().divide(4)));
 
         square.getChildren().add(imageView);
+
+        return Game.IsOver(gameBoard);
     }
 
     private static Action MiniMax_AlphaBetaPruning(State state, int depth) {

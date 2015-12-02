@@ -28,7 +28,7 @@ public class Main extends Application {
     private static int playerScore = 0;
     private static int cpuScore = 0;
     AnchorPane bottomAnchor;
-    private int DEPTH = 0;
+    private static int DEPTH = 0;
 
 
     @Override
@@ -113,30 +113,35 @@ public class Main extends Application {
             square.getChildren().add(imageView);
 
             if (!Game.IsOver(gameBoard)) {
-                MiniMax.Start(gameBoard, 3, PLAYER, CPU, DEPTH++);
-            } else {
-
-                DEPTH = 0;
-
-                Label cpu = (Label) bottomAnchor.lookup("#cpuScore");
-                Label player = (Label) bottomAnchor.lookup("#yourScore");
-
-                int who_won = Game.WhoWon(gameBoard);
-
-                if (who_won == 1) {
-                    player.setText(++playerScore + "");
-                } else if (who_won == -1) {
-                    cpu.setText(++cpuScore + "");
+                if (MiniMax.Start(gameBoard, 3, PLAYER, CPU, DEPTH++)) {
+                    setScoreAndReset(bottomAnchor);
                 }
-
-                Game.StartOver(gameBoard);
-
+            } else {
+                setScoreAndReset(bottomAnchor);
             }
         }
         else
             System.out.print("Already has an x\n");
 
     };
+
+    private static void setScoreAndReset(AnchorPane bottomAnchor) {
+
+        DEPTH = 0;
+
+        Label cpu = (Label) bottomAnchor.lookup("#cpuScore");
+        Label player = (Label) bottomAnchor.lookup("#yourScore");
+
+        int who_won = Game.WhoWon(gameBoard);
+
+        if (who_won == 1) {
+            player.setText(++playerScore + "");
+        } else if (who_won == -1) {
+            cpu.setText(++cpuScore + "");
+        }
+
+        Game.StartOver(gameBoard);
+    }
 
     public static void main(String[] args) {
         launch(args);
