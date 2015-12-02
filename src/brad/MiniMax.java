@@ -24,7 +24,7 @@ public class MiniMax {
      * @param depth
      * @return
      */
-    public static boolean Start(GridPane gameBoard, int size, Image player, Image cpu, int depth) {
+    public static Winner Start(GridPane gameBoard, int size, Image player, Image cpu, int depth) {
 
         PLAYER = player;
         CPU = cpu;
@@ -41,14 +41,6 @@ public class MiniMax {
             System.out.print("\n");
         }
         System.out.print("\n");
-
-
-        /****** Test Board *******/
-        char[][] testBoard = {
-                {'e', 'x', 'e'},
-                {'e', 'e', 'x'},
-                {'o', 'o', 'x'}
-        };
 
         // Call minimax with the state
         State state = new State(board, MIN);
@@ -80,7 +72,9 @@ public class MiniMax {
 
         square.getChildren().add(imageView);
 
-        return Game.IsOver(gameBoard);
+        Winner winner = Game.IsOver(gameBoard);
+
+        return winner;
     }
 
     private static Action MiniMax_AlphaBetaPruning(State state, int depth) {

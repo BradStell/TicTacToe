@@ -7,13 +7,13 @@ import javafx.scene.layout.GridPane;
  */
 public class Game {
 
-    public static boolean IsOver(GridPane gameBoard) {
+    public static Winner IsOver(GridPane gameBoard) {
 
-        boolean terminalState = true;
-        int winner = WhoWon(gameBoard);
+        Winner winner = WhoWon(gameBoard);
 
-        if (winner == 1 || winner == -1) {
-            return true;
+        if (winner.getWhoWon() == 1 || winner.getWhoWon() == -1) {
+            winner.setIsOver(true);
+            return winner;
         }
 
         // Convert gameBoard into 2D array we can work with easier
@@ -21,20 +21,21 @@ public class Game {
             for (int col = 0; col < 3; col++) {
                 GridSquare square = (GridSquare) gameBoard.lookup("#" + row + col);
                 if (square.getContains() == 'e') {
-                    return false;
+                    winner.setIsOver(false);
+                    return winner;
                 }
             }
         }
 
-        return terminalState;
+        return winner;
     }
 
     public static boolean IsOver(State state) {
 
         char[][] boardCopy = state.getBoardCopy();
-        int winner = whoWon(boardCopy);
+        Winner winner = whoWon(boardCopy);
 
-        if (winner == 1 || winner == -1) {
+        if (winner.getWhoWon() == 1 || winner.getWhoWon() == -1) {
             return true;
         }
 
@@ -71,10 +72,12 @@ public class Game {
             if (xcount == 3) {
                 winner.setWhoWon(1);
                 winner.setDirection(Winner.VERTICAL);
+                winner.setStartLine(row);
                 return winner;
             } else if (ocount == 3) {
                 winner.setWhoWon(-1);
                 winner.setDirection(Winner.VERTICAL);
+                winner.setStartLine(row);
                 return winner;
             }
         }
@@ -95,10 +98,12 @@ public class Game {
             if (xcount == 3) {
                 winner.setWhoWon(1);
                 winner.setDirection(Winner.HORIZONTAL);
+                winner.setStartLine(row);
                 return winner;
             } else if (ocount == 3) {
                 winner.setWhoWon(-1);
                 winner.setDirection(Winner.HORIZONTAL);
+                winner.setStartLine(row);
                 return winner;
             }
         }
@@ -116,10 +121,12 @@ public class Game {
         if (xcount == 3) {
             winner.setWhoWon(1);
             winner.setDirection(Winner.DIAGONAL);
+            winner.setStartLine(0);
             return winner;
         } else if (ocount == 3) {
             winner.setWhoWon(-1);
             winner.setDirection(Winner.DIAGONAL);
+            winner.setStartLine(0);
             return winner;
         }
 
@@ -138,17 +145,19 @@ public class Game {
         if (xcount == 3) {
             winner.setWhoWon(1);
             winner.setDirection(Winner.DIAGONAL);
+            winner.setStartLine(2);
             return winner;
         } else if (ocount == 3) {
             winner.setWhoWon(-1);
             winner.setDirection(Winner.DIAGONAL);
+            winner.setStartLine(2);
             return winner;
         }
 
         return winner;
     }
 
-    public static int WhoWon(GridPane gameBoard) {
+    public static Winner WhoWon(GridPane gameBoard) {
 
         char[][] board = new char[3][3];
 
@@ -166,6 +175,8 @@ public class Game {
 
     public static void StartOver(GridPane gameBoard) {
 
+        sleep(2000);
+
         // Convert gameBoard into 2D array we can work with easier
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 3; col++) {
@@ -175,6 +186,13 @@ public class Game {
             }
         }
 
+    }
+
+    private static void sleep(int time) {
+
+        long startTime = System.currentTimeMillis();
+
+        while (System.currentTimeMillis() - time < startTime);
     }
 
     public static int UtilityValue(State state, int depth) {

@@ -13,6 +13,7 @@ import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 /**
@@ -30,6 +31,7 @@ public class Main extends Application {
     private static int cpuScore = 0;
     AnchorPane bottomAnchor;
     private static int DEPTH = 0;
+    private static AnchorPane mainAnchor;
 
 
     @Override
@@ -47,7 +49,7 @@ public class Main extends Application {
     private void buildGameBoard(Parent root) {
 
         gameBoard = new GridPane();
-        AnchorPane mainAnchor = (AnchorPane) root.lookup("#mainAnchor");
+        mainAnchor = (AnchorPane) root.lookup("#mainAnchor");
         bottomAnchor = (AnchorPane) root.lookup("#bottomAnchor");
 
         // Set Grid Pane Column and Row constraints
@@ -113,12 +115,16 @@ public class Main extends Application {
 
             square.getChildren().add(imageView);
 
-            if (!Game.IsOver(gameBoard)) {
-                if (MiniMax.Start(gameBoard, 3, PLAYER, CPU, DEPTH++)) {
-                    drawRect();
+            Winner winner = Game.IsOver(gameBoard);
+
+            if (!winner.getIsOver()) {
+                winner = MiniMax.Start(gameBoard, 3, PLAYER, CPU, DEPTH++);
+                if (winner.getIsOver()) {
+                    drawRect(winner);
                     setScoreAndReset(bottomAnchor);
                 }
             } else {
+                drawRect(winner);
                 setScoreAndReset(bottomAnchor);
             }
         }
@@ -127,34 +133,80 @@ public class Main extends Application {
 
     };
 
-    private static void drawRect() {
+    private static void drawRect(Winner winner) {
 
-        Game.WhoWon(gameBoard);
+        if (winner.getWhoWon() != 0) {
+            Game.WhoWon(gameBoard);
 
-        Line line = new Line();
-        line.setStartX(0.0f);
-        line.setStartY(0.0f);
-        line.setEndX(100.0f);
-        line.setEndY(100.0f);
-        gameBoard.getChildren().add(line);
+            if (winner.getDirection().equals(Winner.HORIZONTAL)) {
+                drawHorizontalLine(winner);
+            } else if (winner.getDirection().equals(Winner.VERTICAL)) {
+                drawVerticalLine(winner);
+            } else if (winner.getDirection().equals(Winner.DIAGONAL)) {
+                drawDiagonalLine(winner);
+            }
+        }
+    }
+
+    private static void drawHorizontalLine(Winner winner) {
+
+        double width = mainAnchor.getWidth() - 20;
+        double height = 7;
+        double startX = 10;
+        double startY = (mainAnchor.getHeight() / 6.0) + ((mainAnchor.getHeight() / 3) * winner.getStartLine()) - (height /2);
+
+        drawLine(startX, startY, width, height);
+    }
+
+    private static void drawVerticalLine(Winner winner) {
+
+        double width = 7;
+        double height = mainAnchor.getHeight() - 20;
+        double startX = (mainAnchor.getWidth() / 6.0) + ((mainAnchor.getWidth() / 3) * winner.getStartLine()) - (width /2);
+        double startY = 10;
+
+
+        drawLine(startX, startY, width, height);
+    }
+
+    private static void drawDiagonalLine(Winner winner) {
+
+        double startX;
+        double startY;
+        double width = gameBoard.getWidth() - 10.0;
+        double height = gameBoard.getHeight() / 6.0;
+
+        //drawLine(startX, startY, width, width);
+    }
+
+    private static void drawLine(double startX, double startY, double width, double height) {
+
+        Rectangle r = new Rectangle();
+        r.setX(startX);
+        r.setY(startY);
+        r.setWidth(width);
+        r.setHeight(height);
+
+        mainAnchor.getChildren().add(r);
+
+        System.out.print("\n\n**** Drew Line ****\n\n");
     }
 
     private static void setScoreAndReset(AnchorPane bottomAnchor) {
 
         DEPTH = 0;
-
         Label cpu = (Label) bottomAnchor.lookup("#cpuScore");
         Label player = (Label) bottomAnchor.lookup("#yourScore");
 
-        int who_won = Game.WhoWon(gameBoard);
+        Winner who_won = Game.WhoWon(gameBoard);
 
-        if (who_won == 1) {
+        if (who_won.getWhoWon() == 1) {
             player.setText(++playerScore + "");
-        } else if (who_won == -1) {
+        } else if (who_won.getWhoWon() == -1) {
             cpu.setText(++cpuScore + "");
         }
 
-        //Game.StartOver(gameBoard);
+        Game.StartOver(gameBoard);
     }
 
     public static void main(String[] args) {
