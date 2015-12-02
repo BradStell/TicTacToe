@@ -49,12 +49,13 @@ public class Game {
         return true;
     }
 
-    private static int whoWon(char[][] board) {
+    private static Winner whoWon(char[][] board) {
 
         // Check for a winner, either x's or o's
 
         int xcount;
         int ocount;
+        Winner winner = new Winner();
 
         // Check Vertical Winner
         for (int row = 0; row < 3; row++) {
@@ -68,9 +69,13 @@ public class Game {
                 }
             }
             if (xcount == 3) {
-                return 1;
+                winner.setWhoWon(1);
+                winner.setDirection(Winner.VERTICAL);
+                return winner;
             } else if (ocount == 3) {
-                return -1;
+                winner.setWhoWon(-1);
+                winner.setDirection(Winner.VERTICAL);
+                return winner;
             }
         }
 
@@ -88,9 +93,13 @@ public class Game {
                 }
             }
             if (xcount == 3) {
-                return 1;
+                winner.setWhoWon(1);
+                winner.setDirection(Winner.HORIZONTAL);
+                return winner;
             } else if (ocount == 3) {
-                return -1;
+                winner.setWhoWon(-1);
+                winner.setDirection(Winner.HORIZONTAL);
+                return winner;
             }
         }
 
@@ -105,9 +114,13 @@ public class Game {
             }
         }
         if (xcount == 3) {
-            return 1;
+            winner.setWhoWon(1);
+            winner.setDirection(Winner.DIAGONAL);
+            return winner;
         } else if (ocount == 3) {
-            return -1;
+            winner.setWhoWon(-1);
+            winner.setDirection(Winner.DIAGONAL);
+            return winner;
         }
 
         xcount = 0;
@@ -123,12 +136,16 @@ public class Game {
             col--;
         }
         if (xcount == 3) {
-            return 1;
+            winner.setWhoWon(1);
+            winner.setDirection(Winner.DIAGONAL);
+            return winner;
         } else if (ocount == 3) {
-            return -1;
+            winner.setWhoWon(-1);
+            winner.setDirection(Winner.DIAGONAL);
+            return winner;
         }
 
-        return 0;
+        return winner;
     }
 
     public static int WhoWon(GridPane gameBoard) {

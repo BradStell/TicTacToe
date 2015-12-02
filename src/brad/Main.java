@@ -12,6 +12,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 
 /**
@@ -114,6 +115,7 @@ public class Main extends Application {
 
             if (!Game.IsOver(gameBoard)) {
                 if (MiniMax.Start(gameBoard, 3, PLAYER, CPU, DEPTH++)) {
+                    drawRect();
                     setScoreAndReset(bottomAnchor);
                 }
             } else {
@@ -124,6 +126,18 @@ public class Main extends Application {
             System.out.print("Already has an x\n");
 
     };
+
+    private static void drawRect() {
+
+        Game.WhoWon(gameBoard);
+
+        Line line = new Line();
+        line.setStartX(0.0f);
+        line.setStartY(0.0f);
+        line.setEndX(100.0f);
+        line.setEndY(100.0f);
+        gameBoard.getChildren().add(line);
+    }
 
     private static void setScoreAndReset(AnchorPane bottomAnchor) {
 
@@ -140,7 +154,7 @@ public class Main extends Application {
             cpu.setText(++cpuScore + "");
         }
 
-        Game.StartOver(gameBoard);
+        //Game.StartOver(gameBoard);
     }
 
     public static void main(String[] args) {
