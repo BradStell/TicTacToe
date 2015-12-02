@@ -18,12 +18,13 @@ public class State {
     private int utilityValue;
     private State parent;
     private ArrayList<State> children;
+    public boolean done = false;
 
 
     public State(char[][] board, char whosTurn) {
         copyBoard(board);
         this.whosTurn = whosTurn;
-        numChildren = countChildrenStates();
+        numChildren = 0;
         action = new Action();
         children = new ArrayList<State>();
     }
@@ -42,11 +43,16 @@ public class State {
         this.parent = parent;
     }
 
-    public void addChild(State child) {
-        children.add(child);
+    public State getParent() {
+        return parent;
     }
 
-    public int getNumChildArray() {
+    public void addChild(State child) {
+        children.add(child);
+        numChildren++;
+    }
+
+    public int getNumChildArraySize() {
         return children.size();
     }
 
@@ -88,21 +94,6 @@ public class State {
 
     public void setBoard(char[][] board) {
         this.board = board;
-    }
-
-    private int countChildrenStates() {
-
-        int children = 0;
-
-        for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 3; col++) {
-                if (board[row][col] == 'e') {
-                    children++;
-                }
-            }
-        }
-
-        return children;
     }
 
     public char[][] getBoardCopy() {

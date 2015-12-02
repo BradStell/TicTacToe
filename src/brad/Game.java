@@ -32,14 +32,12 @@ public class Game {
     public static boolean IsOver(State state) {
 
         char[][] boardCopy = state.getBoardCopy();
-        boolean terminalState = true;
         int winner = whoWon(boardCopy);
 
         if (winner == 1 || winner == -1) {
             return true;
         }
 
-        // Convert gameBoard into 2D array we can work with easier
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 3; col++) {
                 if (boardCopy[row][col] == 'e') {
@@ -48,7 +46,7 @@ public class Game {
             }
         }
 
-        return terminalState;
+        return true;
     }
 
     private static int whoWon(char[][] board) {
@@ -62,7 +60,6 @@ public class Game {
         for (int row = 0; row < 3; row++) {
             xcount = 0;
             ocount = 0;
-
             for (int col = 0; col < 3; col++) {
                 if (board[col][row] == 'x') {
                     xcount++;
@@ -70,7 +67,6 @@ public class Game {
                     ocount++;
                 }
             }
-
             if (xcount == 3) {
                 return 1;
             } else if (ocount == 3) {
@@ -78,13 +74,12 @@ public class Game {
             }
         }
 
-
+        // Horizontal Winner
         xcount = 0;
         ocount = 0;
         for (int row = 0; row < 3; row++) {
             xcount = 0;
             ocount = 0;
-
             for (int col = 0; col < 3; col++) {
                 if (board[row][col] == 'x') {
                     xcount++;
@@ -92,7 +87,6 @@ public class Game {
                     ocount++;
                 }
             }
-
             if (xcount == 3) {
                 return 1;
             } else if (ocount == 3) {
@@ -100,6 +94,7 @@ public class Game {
             }
         }
 
+        // Diagonals
         xcount = 0;
         ocount = 0;
         for (int row = 0; row < 3; row++) {
@@ -109,7 +104,6 @@ public class Game {
                 ocount++;
             }
         }
-
         if (xcount == 3) {
             return 1;
         } else if (ocount == 3) {
@@ -128,7 +122,6 @@ public class Game {
             row++;
             col--;
         }
-
         if (xcount == 3) {
             return 1;
         } else if (ocount == 3) {
@@ -190,9 +183,9 @@ public class Game {
             }
 
             if (xcount == 3) {
-                return depth - 10;
-            } else if (ocount == 3) {
                 return 10 - depth;
+            } else if (ocount == 3) {
+                return depth - 10;
             }
         }
 
@@ -212,9 +205,9 @@ public class Game {
             }
 
             if (xcount == 3) {
-                return depth - 10;
-            } else if (ocount == 3) {
                 return 10 - depth;
+            } else if (ocount == 3) {
+                return depth - 10;
             }
         }
 
@@ -230,9 +223,9 @@ public class Game {
         }
 
         if (xcount == 3) {
-            return depth - 10;
-        } else if (ocount == 3) {
             return 10 - depth;
+        } else if (ocount == 3) {
+            return depth - 10;
         }
 
         xcount = 0;
@@ -249,9 +242,9 @@ public class Game {
         }
 
         if (xcount == 3) {
-            return depth - 10;
-        } else if (ocount == 3) {
             return 10 - depth;
+        } else if (ocount == 3) {
+            return depth - 10;
         }
 
         return score;

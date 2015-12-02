@@ -42,7 +42,7 @@ public class MiniMax {
         };
 
         // Call minimax with the state
-        State state = new State(testBoard, MIN);
+        State state = new State(board, MIN);
         Action action = MiniMax_AlphaBetaPruning(state, 0);
 
         int row = action.getRow();
@@ -81,7 +81,7 @@ public class MiniMax {
         System.out.println("Sigma = " + sigma);
 
         // Print util values
-        for (int i = 0; i < state.getNumChildren(); i++) {
+        for (int i = 0; i < state.getNumChildArraySize(); i++) {
             System.out.print(state.getChild(i).getUtilityValue() + " ");
         }
         System.out.println();
@@ -96,15 +96,27 @@ public class MiniMax {
             }
         }
 
+
+        if (action == null) {
+            int min = Integer.MAX_VALUE;
+            for (int i = 0; i < state.getNumChildArraySize(); i++) {
+                if (state.getChild(i).getUtilityValue() < min) {
+                    min = state.getChild(i).getUtilityValue();
+                    action = state.getChild(i).getAction();
+                }
+            }
+        }
+
         return action;
     }
 
     private static int MaxValue(State state, int alpha, int beta, int depth) {
 
         if (Game.IsOver(state)) {
-            System.out.print("\n\n***Game Over***\n\n");
             int blah = Game.UtilityValue(state, depth);
             System.out.print("Util " + blah + "\n");
+            State parent = state.getParent();
+            parent.done = true;
             return blah;
         }
 
@@ -116,6 +128,7 @@ public class MiniMax {
             }
             System.out.println();
         }
+        System.out.println();
 
         state.setUtilityValue(Integer.MIN_VALUE);
         ArrayList<State> children = getAllChildren(state);
@@ -123,6 +136,10 @@ public class MiniMax {
         for (int i = 0; i < children.size(); i++) {
 
             state.setUtilityValue(Max(state.getUtilityValue(), MinValue(children.get(i), alpha, beta, depth + 1)));
+
+            if (state.done) {
+                break;
+            }
 
             if (state.getUtilityValue() >= beta) {
                 return state.getUtilityValue();
@@ -137,9 +154,10 @@ public class MiniMax {
     private static int MinValue(State state, int alpha, int beta, int depth) {
 
         if (Game.IsOver(state)) {
-            System.out.print("\n\n***Game Over***\n\n");
             int blah = Game.UtilityValue(state, depth);
             System.out.print("Util " + blah + "\n");
+            State parent = state.getParent();
+            parent.done = true;
             return blah;
         }
 
@@ -151,6 +169,7 @@ public class MiniMax {
             }
             System.out.println();
         }
+        System.out.println();
 
         state.setUtilityValue(Integer.MAX_VALUE);
         ArrayList<State> children = getAllChildren(state);
@@ -160,6 +179,10 @@ public class MiniMax {
 
             state.setUtilityValue(Min(state.getUtilityValue(), MaxValue(children.get(i), alpha, beta, depth + 1)));
 
+            if (state.done) {
+                break;
+            }
+
             if (state.getUtilityValue() <= alpha) {
                 return state.getUtilityValue();
             }
@@ -168,27 +191,6 @@ public class MiniMax {
         }
 
         return state.getUtilityValue();
-    }
-
-    private static boolean terminalTest(State state) {
-
-        boolean terminalState = true;
-        char[][] stateBoard = state.getBoard();
-
-
-        for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 3; col++) {
-                if (stateBoard[row][col] == 'e') {
-                    terminalState = false;
-                    break;
-                }
-            }
-            if (!terminalState) {
-                break;
-            }
-        }
-
-        return terminalState;
     }
 
     private static int Max(int sigma, int minimaxValue) {
@@ -223,133 +225,42 @@ public class MiniMax {
                 if (boardCopy[row][col] == 'e') {
 
                     action = new Action();
+                    State child;
 
                     if (state.getWhosTurn() == MiniMax.MIN) {
 
                         boardCopy[row][col] = 'o';
-                        action.setRow(row);
-                        action.setCol(col);
                         action.setImage('o');
-                        State child = new State(boardCopy, MiniMax.MAX);
-                        child.setAction(action);
-                        if (!Game.IsOver(child)) {
-                            System.out.print("\n\nIn if for min\n\n");
-                            children.add(child);
-                            boardCopy[row][col] = 'e';
-                            state.addChild(child);
-                        } else {
-                            done = true;
-                            break;
-                        }
+                        child = new State(boardCopy, MiniMax.MAX);
 
                     } else {
 
                         boardCopy[row][col] = 'x';
-                        action.setRow(row);
-                        action.setCol(col);
                         action.setImage('x');
-                        State child = new State(boardCopy, MiniMax.MIN);
-                        child.setAction(action);
-                        if (!Game.IsOver(child)) {
-                            System.out.print("\n\nIn if for max\n\n");
-                            children.add(child);
-                            boardCopy[row][col] = 'e';
-                            state.addChild(child);
-                        } else {
-                            done = true;
-                            break;
-                        }
-
+                        child = new State(boardCopy, MiniMax.MIN);
                     }
 
-                }
+                    action.setRow(row);
+                    action.setCol(col);
+                    child.setAction(action);
+                    child.setParent(state);
+                    children.add(child);
+                    boardCopy[row][col] = 'e';
+                    state.addChild(child);
 
+                    /*if (!Game.IsOver(child)) {
+                        done = true;
+                        break;
+                    }*/
+                }
             }
-            if (done) {
+
+            /*if (done) {
                 break;
-            }
+            }*/
         }
 
         return children;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        /*char[][] actualState = state.getBoard();
-        char[][] copyState = state.getBoardCopy();
-        State child = null;
-        boolean createdChild = false;
-        Action action = new Action();
-
-        // Generate next available child
-        for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 3; col++) {
-
-                // Find the empty cell
-                if (actualState[row][col] == 'e') {
-
-                    // If its max's turn
-                    if (state.getWhosTurn() == MiniMax.MAX) {
-
-                        actualState[row][col] = 'x';
-                        copyState[row][col] = 'x';
-                        child = new State(copyState, MiniMax.MIN);
-                        child.setParent(state);
-                        createdChild = true;
-
-                        action.setRow(row);
-                        action.setCol(col);
-                        action.setImage('x');
-                        child.setAction(action);
-
-                        break;
-                    }
-
-                    // If its min's turn
-                    else if (state.getWhosTurn() == MiniMax.MIN) {
-
-                        actualState[row][col] = 'o';
-                        copyState[row][col] = 'o';
-                        child = new State(copyState, MiniMax.MAX);
-                        child.setParent(state);
-                        createdChild = true;
-
-                        action.setRow(row);
-                        action.setCol(col);
-                        action.setImage('o');
-                        child.setAction(action);
-
-                        break;
-                    }
-
-
-                }
-            }
-
-            if (createdChild) {
-                break;
-            }
-        }
-
-
-
-        if (child == null) {
-            return state;
-        } else {
-            state.addChild(child);
-            return child;
-        }*/
     }
 
 }
