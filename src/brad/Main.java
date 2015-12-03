@@ -1,6 +1,9 @@
 package brad;
 
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.HPos;
@@ -155,7 +158,7 @@ public class Main extends Application {
         double startX = 10;
         double startY = (mainAnchor.getHeight() / 6.0) + ((mainAnchor.getHeight() / 3) * winner.getStartLine()) - (height /2);
 
-        drawLine(startX, startY, width, height);
+        drawLine(startX, startY, width, height, false, winner);
     }
 
     private static void drawVerticalLine(Winner winner) {
@@ -166,26 +169,34 @@ public class Main extends Application {
         double startY = 10;
 
 
-        drawLine(startX, startY, width, height);
+        drawLine(startX, startY, width, height, false, winner);
     }
 
     private static void drawDiagonalLine(Winner winner) {
 
-        double startX;
-        double startY;
-        double width = gameBoard.getWidth() - 10.0;
-        double height = gameBoard.getHeight() / 6.0;
+        double width = mainAnchor.getWidth() - 20;
+        double height = 7;
+        double startX = 10;
+        double startY = (mainAnchor.getHeight() / 6.0) + ((mainAnchor.getHeight() / 3) * 1) - (height /2);
 
-        //drawLine(startX, startY, width, width);
+        drawLine(startX, startY, width, height, true, winner);
     }
 
-    private static void drawLine(double startX, double startY, double width, double height) {
+    private static void drawLine(double startX, double startY, double width, double height, boolean rotate, Winner winner) {
 
         Rectangle r = new Rectangle();
         r.setX(startX);
         r.setY(startY);
         r.setWidth(width);
         r.setHeight(height);
+        r.setId("Rectangle");
+
+        if (rotate) {
+            if (winner.getStartLine() == 0)
+                r.setRotate(33);
+            else
+                r.setRotate(-33);
+        }
 
         mainAnchor.getChildren().add(r);
 
@@ -206,7 +217,15 @@ public class Main extends Application {
             cpu.setText(++cpuScore + "");
         }
 
-        Game.StartOver(gameBoard);
+        Task<Void> sleeper = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                Thread.sleep(2000);
+                return null;
+            }
+        };
+        sleeper.setOnSucceeded(event -> Game.StartOver(gameBoard, mainAnchor));
+        new Thread(sleeper).start();
     }
 
     public static void main(String[] args) {

@@ -1,5 +1,6 @@
 package brad;
 
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 
 /**
@@ -11,7 +12,7 @@ public class Game {
 
         Winner winner = WhoWon(gameBoard);
 
-        if (winner.getWhoWon() == 1 || winner.getWhoWon() == -1) {
+        if (winner.getWhoWon() != 0) {
             winner.setIsOver(true);
             return winner;
         }
@@ -27,6 +28,7 @@ public class Game {
             }
         }
 
+        winner.setIsOver(true);
         return winner;
     }
 
@@ -173,9 +175,7 @@ public class Game {
 
     }
 
-    public static void StartOver(GridPane gameBoard) {
-
-        sleep(2000);
+    public static void StartOver(GridPane gameBoard, AnchorPane mainAnchor) {
 
         // Convert gameBoard into 2D array we can work with easier
         for (int row = 0; row < 3; row++) {
@@ -186,13 +186,9 @@ public class Game {
             }
         }
 
-    }
 
-    private static void sleep(int time) {
+        mainAnchor.getChildren().remove(mainAnchor.lookup("#Rectangle"));
 
-        long startTime = System.currentTimeMillis();
-
-        while (System.currentTimeMillis() - time < startTime);
     }
 
     public static int UtilityValue(State state, int depth) {
