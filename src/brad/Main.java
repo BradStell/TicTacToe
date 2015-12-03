@@ -9,6 +9,8 @@ import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
@@ -22,7 +24,7 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
-    private final Image X_IMAGE = new Image(String.valueOf(getClass().getResource("/resources/images/x-red.png")));
+    private Image X_IMAGE = new Image(String.valueOf(getClass().getResource("/resources/images/x-red.png")));
     private final Image O_IMAGE = new Image(String.valueOf(getClass().getResource("/resources/images/o-neon-green.png")));
     public final Image PLAYER = X_IMAGE;
     public final Image CPU = O_IMAGE;
@@ -31,6 +33,8 @@ public class Main extends Application {
     private static int cpuScore = 0;
     AnchorPane bottomAnchor;
     private static AnchorPane mainAnchor;
+    private static ComboBox comboBox;
+    private static Button sizeButton;
 
 
     @Override
@@ -48,8 +52,12 @@ public class Main extends Application {
     private void buildGameBoard(Parent root) {
 
         gameBoard = new GridPane();
+        gameBoard.setId("gameBoard");
         mainAnchor = (AnchorPane) root.lookup("#mainAnchor");
         bottomAnchor = (AnchorPane) root.lookup("#bottomAnchor");
+        comboBox = (ComboBox) root.lookup("#sizeBox");
+        sizeButton = (Button) root.lookup("#sizeButton");
+        sizeButton.setOnMouseClicked(sizeBoxClickListner);
 
         // Set Grid Pane Column and Row constraints
         setGridPaneConstraints(gameBoard, mainAnchor);
@@ -129,6 +137,39 @@ public class Main extends Application {
             }
         }
 
+    };
+
+    private final EventHandler<MouseEvent> sizeBoxClickListner = event -> {
+
+        mainAnchor.getChildren().clear();
+        gameBoard = new GridPane();
+
+        // Set Grid Pane Column and Row constraints
+        setGridPaneConstraints(gameBoard, mainAnchor);
+
+        // Set anchors on gameBoard so it expands and contracts with window size
+        setAnchors(gameBoard);
+        int size = (Integer) comboBox.getValue();
+
+        System.out.print(size);
+
+        // Build tic-tac-toe grid
+        for (int row = 0; row < size; row++) {
+            for (int col = 0; col < size; col++) {
+
+                // Make a new Tic Tac Toe game square | set it to empty ('e') | make the square grow vertically
+                // and horizontally with an expanding window frame
+                GridSquare square = new GridSquare(mainAnchor.getWidth() / size, mainAnchor.getHeight() / size, gameBoard, row, col);
+                square.setContains('e');
+                square.setId("" + row + col);
+                square.setOnMouseClicked(myMouseHandler);
+
+                gameBoard.add(square, col, row);
+            }
+        }
+
+        gameBoard.setAlignment(Pos.CENTER);
+        mainAnchor.getChildren().add(gameBoard);
     };
 
     private static void drawRect(Winner winner) {

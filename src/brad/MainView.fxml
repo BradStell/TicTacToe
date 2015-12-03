@@ -14,11 +14,35 @@
    </top>
 
    <left>
-      <VBox prefHeight="322.0" prefWidth="123.0" BorderPane.alignment="CENTER" />
+      <VBox prefHeight="322.0" prefWidth="123.0" BorderPane.alignment="CENTER">
+         <children>
+            <VBox prefHeight="322.0" prefWidth="123.0">
+               <children>
+                  <HBox alignment="CENTER" prefHeight="44.0" prefWidth="123.0">
+                     <children>
+                        <Label text="Grid Size" />
+                     </children>
+                  </HBox>
+                  <VBox alignment="TOP_CENTER" prefHeight="70.0" prefWidth="123.0" spacing="20.0">
+                     <children>
+                        <ComboBox fx:id="sizeBox" value="3" minWidth="50" maxWidth="100" prefWidth="75.0" />
+                     </children>
+                     <padding>
+                        <Insets top="20.0" />
+                     </padding>
+                  </VBox>
+                  <HBox alignment="CENTER" prefHeight="134.0" prefWidth="123.0">
+                     <children>
+                        <Button fx:id="sizeButton" mnemonicParsing="false" text="Change!" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </children></VBox>
    </left>
 
    <center>
-      <AnchorPane fx:id="mainAnchor" prefHeight="200.0" prefWidth="200.0" maxWidth="Infinity" maxHeight="Infinity" BorderPane.alignment="CENTER" />
+      <AnchorPane fx:id="mainAnchor" maxHeight="Infinity" maxWidth="Infinity" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
    </center>
 
    <right>
