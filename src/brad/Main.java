@@ -35,6 +35,7 @@ public class Main extends Application {
     private static AnchorPane mainAnchor;
     private static ComboBox comboBox;
     private static Button sizeButton;
+    private static int size;
 
 
     @Override
@@ -45,6 +46,7 @@ public class Main extends Application {
         scene.getStylesheets().add("/brad/style.css");
         primaryStage.setScene(scene);
         primaryStage.show();
+        size = 3;
 
         buildGameBoard(root);
     }
@@ -60,18 +62,18 @@ public class Main extends Application {
         sizeButton.setOnMouseClicked(sizeBoxClickListner);
 
         // Set Grid Pane Column and Row constraints
-        setGridPaneConstraints(gameBoard, mainAnchor);
+        setGridPaneConstraints(gameBoard, mainAnchor, size);
 
         // Set anchors on gameBoard so it expands and contracts with window size
         setAnchors(gameBoard);
 
         // Build tic-tac-toe grid
-        for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 3; col++) {
+        for (int row = 0; row < size; row++) {
+            for (int col = 0; col < size; col++) {
 
                 // Make a new Tic Tac Toe game square | set it to empty ('e') | make the square grow vertically
                 // and horizontally with an expanding window frame
-                GridSquare square = new GridSquare(mainAnchor.getWidth() / 3, mainAnchor.getHeight() / 3, gameBoard, row, col);
+                GridSquare square = new GridSquare(mainAnchor.getWidth() / size, mainAnchor.getHeight() / size, gameBoard, row, col, size);
                 square.setContains('e');
                 square.setId("" + row + col);
                 square.setOnMouseClicked(myMouseHandler);
@@ -92,18 +94,15 @@ public class Main extends Application {
         AnchorPane.setBottomAnchor(gameBoard, 0.0);
     }
 
-    private void setGridPaneConstraints(GridPane gameBoard, AnchorPane mainAnchor) {
+    private void setGridPaneConstraints(GridPane gameBoard, AnchorPane mainAnchor, int size) {
 
-        ColumnConstraints col1 = new ColumnConstraints(10.0, mainAnchor.getWidth() / 3, Double.MAX_VALUE, Priority.ALWAYS, HPos.CENTER, true);
-        ColumnConstraints col2 = new ColumnConstraints(10.0, mainAnchor.getWidth() / 3, Double.MAX_VALUE, Priority.ALWAYS, HPos.CENTER, true);
-        ColumnConstraints col3 = new ColumnConstraints(10.0, mainAnchor.getWidth() / 3, Double.MAX_VALUE, Priority.ALWAYS, HPos.CENTER, true);
+        for (int i = 0; i < size; i++) {
+            ColumnConstraints col1 = new ColumnConstraints(10.0, mainAnchor.getWidth() / size, Double.MAX_VALUE, Priority.ALWAYS, HPos.CENTER, true);
+            RowConstraints row1 = new RowConstraints(10.0, mainAnchor.getHeight() / size, Double.MAX_VALUE, Priority.ALWAYS, VPos.CENTER, true);
 
-        RowConstraints row1 = new RowConstraints(10.0, mainAnchor.getHeight() / 3, Double.MAX_VALUE, Priority.ALWAYS, VPos.CENTER, true);
-        RowConstraints row2 = new RowConstraints(10.0, mainAnchor.getHeight() / 3, Double.MAX_VALUE, Priority.ALWAYS, VPos.CENTER, true);
-        RowConstraints row3 = new RowConstraints(10.0, mainAnchor.getHeight() / 3, Double.MAX_VALUE, Priority.ALWAYS, VPos.CENTER, true);
-
-        gameBoard.getColumnConstraints().addAll(col1, col2, col3);
-        gameBoard.getRowConstraints().addAll(row1, row2, row3);
+            gameBoard.getColumnConstraints().add(col1);
+            gameBoard.getRowConstraints().add(row1);
+        }
     }
 
     private final EventHandler<MouseEvent> myMouseHandler = event -> {
@@ -123,10 +122,10 @@ public class Main extends Application {
 
             square.getChildren().add(imageView);
 
-            Winner winner = Game.IsOver(gameBoard);
+            Winner winner = Game.IsOver(gameBoard, size);
 
             if (!winner.getIsOver()) {
-                winner = MiniMax.Start(gameBoard, 3, PLAYER, CPU);
+                winner = MiniMax.Start(gameBoard, size, PLAYER, CPU);
                 if (winner.getIsOver()) {
                     drawRect(winner);
                     setScoreAndReset(bottomAnchor, winner);
@@ -142,16 +141,17 @@ public class Main extends Application {
     private final EventHandler<MouseEvent> sizeBoxClickListner = event -> {
 
         mainAnchor.getChildren().clear();
+        gameBoard.getChildren().clear();
         gameBoard = new GridPane();
+        gameBoard.setId("gameBoard");
+        String sizeString = (String) comboBox.getValue();
+        size = Integer.parseInt(sizeString);
 
         // Set Grid Pane Column and Row constraints
-        setGridPaneConstraints(gameBoard, mainAnchor);
+        setGridPaneConstraints(gameBoard, mainAnchor, size);
 
         // Set anchors on gameBoard so it expands and contracts with window size
         setAnchors(gameBoard);
-        int size = (Integer) comboBox.getValue();
-
-        System.out.print(size);
 
         // Build tic-tac-toe grid
         for (int row = 0; row < size; row++) {
@@ -159,7 +159,7 @@ public class Main extends Application {
 
                 // Make a new Tic Tac Toe game square | set it to empty ('e') | make the square grow vertically
                 // and horizontally with an expanding window frame
-                GridSquare square = new GridSquare(mainAnchor.getWidth() / size, mainAnchor.getHeight() / size, gameBoard, row, col);
+                GridSquare square = new GridSquare(mainAnchor.getWidth() / size, mainAnchor.getHeight() / size, gameBoard, row, col, size);
                 square.setContains('e');
                 square.setId("" + row + col);
                 square.setOnMouseClicked(myMouseHandler);
@@ -191,7 +191,7 @@ public class Main extends Application {
         double width = mainAnchor.getWidth() - 20;
         double height = 7;
         double startX = 10;
-        double startY = (mainAnchor.getHeight() / 6.0) + ((mainAnchor.getHeight() / 3) * winner.getStartLine()) - (height /2);
+        double startY = (mainAnchor.getHeight() / 6.0) + ((mainAnchor.getHeight() / size) * winner.getStartLine()) - (height /2);
 
         drawLine(startX, startY, width, height, false, winner);
     }
@@ -200,7 +200,7 @@ public class Main extends Application {
 
         double width = 7;
         double height = mainAnchor.getHeight() - 20;
-        double startX = (mainAnchor.getWidth() / 6.0) + ((mainAnchor.getWidth() / 3) * winner.getStartLine()) - (width /2);
+        double startX = (mainAnchor.getWidth() / 6.0) + ((mainAnchor.getWidth() / size) * winner.getStartLine()) - (width /2);
         double startY = 10;
 
 
@@ -212,7 +212,7 @@ public class Main extends Application {
         double width = mainAnchor.getWidth() - 20;
         double height = 7;
         double startX = 10;
-        double startY = (mainAnchor.getHeight() / 6.0) + ((mainAnchor.getHeight() / 3) * 1) - (height /2);
+        double startY = (mainAnchor.getHeight() / 6.0) + ((mainAnchor.getHeight() / size) * 1) - (height /2);
 
         drawLine(startX, startY, width, height, true, winner);
     }
@@ -255,7 +255,7 @@ public class Main extends Application {
                 return null;
             }
         };
-        sleeper.setOnSucceeded(event -> Game.StartOver(gameBoard, mainAnchor));
+        sleeper.setOnSucceeded(event -> Game.StartOver(gameBoard, mainAnchor, size));
         new Thread(sleeper).start();
     }
 

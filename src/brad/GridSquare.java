@@ -19,14 +19,14 @@ public class GridSquare extends StackPane {
     private int row;
     private char contains;  // 'e' if empty, 'x' if x, 'o' if o
 
-    public GridSquare(double squareWidth, double squareHeight, GridPane parent, int row, int col) {
+    public GridSquare(double squareWidth, double squareHeight, GridPane parent, int row, int col, int size) {
 
         Rectangle rect = new Rectangle(squareWidth, squareHeight);
         rect.setFill(null);
         rect.setStroke(Color.BLACK);
 
-        rect.widthProperty().bind(parent.widthProperty().divide(3.0));
-        rect.heightProperty().bind(parent.heightProperty().divide(3.0));
+        rect.widthProperty().bind(parent.widthProperty().divide(size));
+        rect.heightProperty().bind(parent.heightProperty().divide(size));
 
         setAlignment(Pos.CENTER);
         getChildren().addAll(rect);

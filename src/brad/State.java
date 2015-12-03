@@ -19,21 +19,23 @@ public class State {
     private State parent;
     private ArrayList<State> children;
     public boolean done = false;
+    private int size;
 
 
-    public State(char[][] board, char whosTurn) {
+    public State(char[][] board, char whosTurn, int size) {
         copyBoard(board);
         this.whosTurn = whosTurn;
         numChildren = 0;
         action = new Action();
         children = new ArrayList<State>();
+        this.size = size;
     }
 
     private void copyBoard(char[][] board) {
-        this.board = new char[3][3];
+        this.board = new char[size][size];
 
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
                 this.board[i][j] = board[i][j];
             }
         }
@@ -98,10 +100,10 @@ public class State {
 
     public char[][] getBoardCopy() {
 
-        char[][] stateCopy = new char[3][3];
+        char[][] stateCopy = new char[size][size];
 
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
                 stateCopy[i][j] = board[i][j];
             }
         }

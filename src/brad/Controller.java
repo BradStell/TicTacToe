@@ -23,7 +23,7 @@ import java.util.ResourceBundle;
 public class Controller implements Initializable {
 
     @FXML
-    ComboBox<Integer> sizeBox;
+    ComboBox<String> sizeBox;
 
     @FXML
     BorderPane root;
@@ -36,8 +36,10 @@ public class Controller implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        sizeBox.setItems(FXCollections.observableArrayList(3, 5, 7, 9, 11, 13));
+
+        sizeBox.setItems(FXCollections.observableArrayList("3", "5", "7", "9", "11", "13"));
         sizeBox.setEditable(true);
+        sizeBox.setValue("3");
     }
 
     @FXML

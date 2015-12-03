@@ -29,7 +29,7 @@ public class MiniMax {
 
         PLAYER = player;
         CPU = cpu;
-        char[][] board = new char[3][3];
+        char[][] board = new char[size][size];
 
         // Convert gameBoard into 2D array we can work with easier
         for (int row = 0; row < size; row++) {
@@ -40,8 +40,8 @@ public class MiniMax {
         }
 
         // Call MiniMax with the incoming game state
-        State state = new State(board, MIN);
-        Action action = MiniMax_AlphaBetaPruning(state, 0);
+        State state = new State(board, MIN, size);
+        Action action = MiniMax_AlphaBetaPruning(state, 0, size);
 
         // Handle the action returned from the MiniMax algorithm
         int row = action.getRow();
@@ -68,15 +68,15 @@ public class MiniMax {
 
         gridSquare.getChildren().add(imageView);
 
-        return Game.IsOver(gameBoard);
+        return Game.IsOver(gameBoard, size);
     }
 
-    private static Action MiniMax_AlphaBetaPruning(State state, int depth) {
+    private static Action MiniMax_AlphaBetaPruning(State state, int depth, int size) {
 
         Action action = null;
 
         // Call MinValue with the incoming state
-        int sigma = MinValue(state, Integer.MIN_VALUE, Integer.MAX_VALUE, depth);
+        int sigma = MinValue(state, Integer.MIN_VALUE, Integer.MAX_VALUE, depth, size);
 
         // Find the state's child who's utility value matches the sigma value
         // returned from MinValue
@@ -102,23 +102,23 @@ public class MiniMax {
         return action;
     }
 
-    private static int MaxValue(State state, int alpha, int beta, int depth) {
+    private static int MaxValue(State state, int alpha, int beta, int depth, int size) {
 
         // If the state is a finished state return its utility value
-        if ((Game.IsOver(state)).getIsOver()) {
-            Winner utilityValue = Game.UtilityValue(state, depth);
+        if ((Game.IsOver(state, size)).getIsOver()) {
+            Winner utilityValue = Game.UtilityValue(state, depth, size);
             State parent = state.getParent();
             parent.done = true;
             return utilityValue.getUtilityValue();
         }
 
         state.setUtilityValue(Integer.MIN_VALUE);
-        ArrayList<State> children = getAllChildren(state);
+        ArrayList<State> children = getAllChildren(state, size);
 
         for (State child : children) {
 
             // Call MinValue with each child
-            state.setUtilityValue(Max(state.getUtilityValue(), MinValue(child, alpha, beta, depth + 1)));
+            state.setUtilityValue(Max(state.getUtilityValue(), MinValue(child, alpha, beta, depth + 1, size)));
 
             // If the states child has reached a terminal state
             // no need to check other children
@@ -141,22 +141,22 @@ public class MiniMax {
         return state.getUtilityValue();
     }
 
-    private static int MinValue(State state, int alpha, int beta, int depth) {
+    private static int MinValue(State state, int alpha, int beta, int depth, int size) {
 
-        if ((Game.IsOver(state)).getIsOver()) {
-            Winner utilityValue = Game.UtilityValue(state, depth);
+        if ((Game.IsOver(state, size)).getIsOver()) {
+            Winner utilityValue = Game.UtilityValue(state, depth, size);
             State parent = state.getParent();
             parent.done = true;
             return utilityValue.getUtilityValue();
         }
 
         state.setUtilityValue(Integer.MAX_VALUE);
-        ArrayList<State> children = getAllChildren(state);
+        ArrayList<State> children = getAllChildren(state, size);
 
         // Generate all children
         for (State child : children) {
 
-            state.setUtilityValue(Min(state.getUtilityValue(), MaxValue(child, alpha, beta, depth + 1)));
+            state.setUtilityValue(Min(state.getUtilityValue(), MaxValue(child, alpha, beta, depth + 1, size)));
 
             if (state.done) {
                 break;
@@ -190,14 +190,14 @@ public class MiniMax {
         }
     }
 
-    private static ArrayList<State> getAllChildren(State state) {
+    private static ArrayList<State> getAllChildren(State state, int size) {
 
         char[][] boardCopy = state.getBoardCopy();
         Action action = null;
         ArrayList<State> children = new ArrayList<>();
 
-        for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 3; col++) {
+        for (int row = 0; row < size; row++) {
+            for (int col = 0; col < size; col++) {
 
                 if (boardCopy[row][col] == 'e') {
 
@@ -208,13 +208,13 @@ public class MiniMax {
 
                         boardCopy[row][col] = MIN;
                         action.setImage(MIN);
-                        child = new State(boardCopy, MiniMax.MAX);
+                        child = new State(boardCopy, MiniMax.MAX, size);
 
                     } else {
 
                         boardCopy[row][col] = MAX;
                         action.setImage(MAX);
-                        child = new State(boardCopy, MiniMax.MIN);
+                        child = new State(boardCopy, MiniMax.MIN, size);
                     }
 
                     action.setRow(row);
