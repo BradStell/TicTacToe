@@ -14,52 +14,45 @@ public class Game {
 
     public static Winner IsOver(GridPane gameBoard) {
 
-        Winner winner = WhoWon(gameBoard);
+        char[][] boardCopy = new char[3][3];
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 3; col++) {
+                boardCopy[row][col] = ((GridSquare)gameBoard.lookup("#" + row + col)).getContains();
+            }
+        }
 
-        // Check to see if there is a winner
+        return isOver(boardCopy);
+    }
+
+    private static Winner isOver(char[][] board) {
+
+        Winner winner = whoWon(board, 0);
+
         if (winner.getWhoWon() != 0) {
             winner.setIsOver(true);
             return winner;
         }
 
-        // If no winner then check to see if there are still empty tiles
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 3; col++) {
-                GridSquare square = (GridSquare) gameBoard.lookup("#" + row + col);
-                if (square.getContains() == 'e') {
+                if (board[row][col] == 'e') {
                     winner.setIsOver(false);
                     return winner;
                 }
             }
         }
 
-        // If there is no winner but there are also no empty tiles, then the game
-        // is over with a draw
         winner.setIsOver(true);
         return winner;
     }
 
-    public static boolean IsOver(State state) {
+    public static Winner IsOver(State state) {
 
         char[][] boardCopy = state.getBoardCopy();
-        Winner winner = whoWon(boardCopy);
-
-        if (winner.getWhoWon() != 0) {
-            return true;
-        }
-
-        for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 3; col++) {
-                if (boardCopy[row][col] == 'e') {
-                    return false;
-                }
-            }
-        }
-
-        return true;
+        return isOver(boardCopy);
     }
 
-    private static Winner whoWon(char[][] board) {
+    private static Winner whoWon(char[][] board, int depth) {
 
         // Check for a winner, either x's or o's
 
@@ -82,11 +75,13 @@ public class Game {
                 winner.setWhoWon(1);
                 winner.setDirection(Winner.VERTICAL);
                 winner.setStartLine(row);
+                winner.setUtilityValue(10 - depth);
                 return winner;
             } else if (ocount == 3) {
                 winner.setWhoWon(-1);
                 winner.setDirection(Winner.VERTICAL);
                 winner.setStartLine(row);
+                winner.setUtilityValue(depth - 10);
                 return winner;
             }
         }
@@ -108,11 +103,13 @@ public class Game {
                 winner.setWhoWon(1);
                 winner.setDirection(Winner.HORIZONTAL);
                 winner.setStartLine(row);
+                winner.setUtilityValue(10 - depth);
                 return winner;
             } else if (ocount == 3) {
                 winner.setWhoWon(-1);
                 winner.setDirection(Winner.HORIZONTAL);
                 winner.setStartLine(row);
+                winner.setUtilityValue(depth - 10);
                 return winner;
             }
         }
@@ -131,11 +128,13 @@ public class Game {
             winner.setWhoWon(1);
             winner.setDirection(Winner.DIAGONAL);
             winner.setStartLine(0);
+            winner.setUtilityValue(10 - depth);
             return winner;
         } else if (ocount == 3) {
             winner.setWhoWon(-1);
             winner.setDirection(Winner.DIAGONAL);
             winner.setStartLine(0);
+            winner.setUtilityValue(depth - 10);
             return winner;
         }
 
@@ -155,11 +154,13 @@ public class Game {
             winner.setWhoWon(1);
             winner.setDirection(Winner.DIAGONAL);
             winner.setStartLine(2);
+            winner.setUtilityValue(10 - depth);
             return winner;
         } else if (ocount == 3) {
             winner.setWhoWon(-1);
             winner.setDirection(Winner.DIAGONAL);
             winner.setStartLine(2);
+            winner.setUtilityValue(depth - 10);
             return winner;
         }
 
@@ -178,7 +179,7 @@ public class Game {
             }
         }
 
-        return whoWon(board);
+        return whoWon(board, 0);
 
     }
 
@@ -195,93 +196,9 @@ public class Game {
         mainAnchor.getChildren().remove(mainAnchor.lookup("#Rectangle"));
     }
 
-    public static int UtilityValue(State state, int depth) {
+    public static Winner UtilityValue(State state, int depth) {
 
         char[][] board = state.getBoard();
-        int score = 0;
-
-        // Check for a winner, either x's or o's
-
-        int xcount;
-        int ocount;
-
-        for (int row = 0; row < 3; row++) {
-            xcount = 0;
-            ocount = 0;
-
-            for (int col = 0; col < 3; col++) {
-                if (board[col][row] == 'x') {
-                    xcount++;
-                } else if (board[col][row] == 'o') {
-                    ocount++;
-                }
-            }
-
-            if (xcount == 3) {
-                return 10 - depth;
-            } else if (ocount == 3) {
-                return depth - 10;
-            }
-        }
-
-
-        xcount = 0;
-        ocount = 0;
-        for (int row = 0; row < 3; row++) {
-            xcount = 0;
-            ocount = 0;
-
-            for (int col = 0; col < 3; col++) {
-                if (board[row][col] == 'x') {
-                    xcount++;
-                } else if (board[row][col] == 'o') {
-                    ocount++;
-                }
-            }
-
-            if (xcount == 3) {
-                return 10 - depth;
-            } else if (ocount == 3) {
-                return depth - 10;
-            }
-        }
-
-        xcount = 0;
-        ocount = 0;
-
-        for (int row = 0; row < 3; row++) {
-            if (board[row][row] == 'x') {
-                xcount++;
-            } else if (board[row][row] == 'o') {
-                ocount++;
-            }
-        }
-
-        if (xcount == 3) {
-            return 10 - depth;
-        } else if (ocount == 3) {
-            return depth - 10;
-        }
-
-        xcount = 0;
-        ocount = 0;
-        int row = 0, col = 2;
-        for (int i = 0; i < 3; i++) {
-            if (board[row][col] == 'x') {
-                xcount++;
-            } else if (board[row][col] == 'o') {
-                ocount++;
-            }
-            row++;
-            col--;
-        }
-
-        if (xcount == 3) {
-            return 10 - depth;
-        } else if (ocount == 3) {
-            return depth - 10;
-        }
-
-        return score;
+        return whoWon(board, depth);
     }
 }

@@ -105,11 +105,11 @@ public class MiniMax {
     private static int MaxValue(State state, int alpha, int beta, int depth) {
 
         // If the state is a finished state return its utility value
-        if (Game.IsOver(state)) {
-            int utilityValue = Game.UtilityValue(state, depth);
+        if ((Game.IsOver(state)).getIsOver()) {
+            Winner utilityValue = Game.UtilityValue(state, depth);
             State parent = state.getParent();
             parent.done = true;
-            return utilityValue;
+            return utilityValue.getUtilityValue();
         }
 
         state.setUtilityValue(Integer.MIN_VALUE);
@@ -143,11 +143,11 @@ public class MiniMax {
 
     private static int MinValue(State state, int alpha, int beta, int depth) {
 
-        if (Game.IsOver(state)) {
-            int utilityValue = Game.UtilityValue(state, depth);
+        if ((Game.IsOver(state)).getIsOver()) {
+            Winner utilityValue = Game.UtilityValue(state, depth);
             State parent = state.getParent();
             parent.done = true;
-            return utilityValue;
+            return utilityValue.getUtilityValue();
         }
 
         state.setUtilityValue(Integer.MAX_VALUE);

@@ -12,6 +12,7 @@ public class Winner {
     private int whoWon;
     private int startLine;
     private boolean isOver;
+    private int utilityValue;
 
 
     public Winner() {
@@ -19,6 +20,15 @@ public class Winner {
         whoWon = 0;
         startLine = -1;
         isOver = false;
+        utilityValue = 0;
+    }
+
+    public void setUtilityValue(int utilVal) {
+        utilityValue = utilVal;
+    }
+
+    public int getUtilityValue() {
+        return utilityValue;
     }
 
     public void setIsOver(boolean b) {
