@@ -5,6 +5,10 @@ import javafx.scene.layout.GridPane;
 
 /**
  * Created by Bradley on 12/1/2015.
+ *
+ * Contains methods for the tic tac toe game
+ * Designed to keep minimax as generic as possible handling specific
+ * game related tasks here.
  */
 public class Game {
 
@@ -12,12 +16,13 @@ public class Game {
 
         Winner winner = WhoWon(gameBoard);
 
+        // Check to see if there is a winner
         if (winner.getWhoWon() != 0) {
             winner.setIsOver(true);
             return winner;
         }
 
-        // Convert gameBoard into 2D array we can work with easier
+        // If no winner then check to see if there are still empty tiles
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 3; col++) {
                 GridSquare square = (GridSquare) gameBoard.lookup("#" + row + col);
@@ -28,6 +33,8 @@ public class Game {
             }
         }
 
+        // If there is no winner but there are also no empty tiles, then the game
+        // is over with a draw
         winner.setIsOver(true);
         return winner;
     }
@@ -37,7 +44,7 @@ public class Game {
         char[][] boardCopy = state.getBoardCopy();
         Winner winner = whoWon(boardCopy);
 
-        if (winner.getWhoWon() == 1 || winner.getWhoWon() == -1) {
+        if (winner.getWhoWon() != 0) {
             return true;
         }
 
@@ -177,7 +184,6 @@ public class Game {
 
     public static void StartOver(GridPane gameBoard, AnchorPane mainAnchor) {
 
-        // Convert gameBoard into 2D array we can work with easier
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 3; col++) {
                 GridSquare square = (GridSquare) gameBoard.lookup("#" + row + col);
@@ -186,9 +192,7 @@ public class Game {
             }
         }
 
-
         mainAnchor.getChildren().remove(mainAnchor.lookup("#Rectangle"));
-
     }
 
     public static int UtilityValue(State state, int depth) {
@@ -280,6 +284,4 @@ public class Game {
 
         return score;
     }
-
-
 }

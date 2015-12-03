@@ -7,6 +7,8 @@ import java.util.ArrayList;
 
 /**
  * Created by Brad on 11/7/2015.
+ *
+ * MiniMax algorithm with alpha beta pruning implementation
  */
 public class MiniMax {
 
@@ -17,18 +19,16 @@ public class MiniMax {
 
     /**
      * Returns true if the game is over - false if it is not over
-     * @param gameBoard
-     * @param size
-     * @param player
-     * @param cpu
-     * @param depth
-     * @return
+     * @param gameBoard - The tic tac toe grid
+     * @param size - the number of rows and columns in the grid
+     * @param player - the players image (x or o)
+     * @param cpu - the cpu's image (x or o)
+     * @return - A winner object that contains information about the game
      */
-    public static Winner Start(GridPane gameBoard, int size, Image player, Image cpu, int depth) {
+    public static Winner Start(GridPane gameBoard, int size, Image player, Image cpu) {
 
         PLAYER = player;
         CPU = cpu;
-
         char[][] board = new char[3][3];
 
         // Convert gameBoard into 2D array we can work with easier
@@ -36,16 +36,14 @@ public class MiniMax {
             for (int col = 0; col < size; col++) {
                 GridSquare square = (GridSquare) gameBoard.lookup("#" + row + col);
                 board[row][col] = square.getContains();
-                System.out.print(board[row][col] + " ");
             }
-            System.out.print("\n");
         }
-        System.out.print("\n");
 
-        // Call minimax with the state
+        // Call MiniMax with the incoming game state
         State state = new State(board, MIN);
         Action action = MiniMax_AlphaBetaPruning(state, 0);
 
+        // Handle the action returned from the MiniMax algorithm
         int row = action.getRow();
         int col = action.getCol();
         GridSquare gridSquare = (GridSquare) gameBoard.lookup("#" + row + col);
@@ -53,55 +51,44 @@ public class MiniMax {
         MyImageView imageView = new MyImageView();
         imageView.setId("image");
 
-        if (action.getImage() == 'x') {
+        if (action.getImage() == MAX) {
 
             imageView.setImage(PLAYER);
-            gridSquare.setContains('x');
+            gridSquare.setContains(MAX);
 
-        } else if (action.getImage() == 'o') {
+        } else if (action.getImage() == MIN) {
 
             imageView.setImage(CPU);
-            gridSquare.setContains('o');
+            gridSquare.setContains(MIN);
 
         }
 
-        GridSquare square = (GridSquare) gameBoard.lookup("#" + row + col);
+        imageView.fitWidthProperty().bind(gridSquare.widthProperty().subtract(gridSquare.widthProperty().divide(4)));
+        imageView.fitHeightProperty().bind(gridSquare.heightProperty().subtract(gridSquare.heightProperty().divide(4)));
 
-        imageView.fitWidthProperty().bind(square.widthProperty().subtract(square.widthProperty().divide(4)));
-        imageView.fitHeightProperty().bind(square.heightProperty().subtract(square.heightProperty().divide(4)));
+        gridSquare.getChildren().add(imageView);
 
-        square.getChildren().add(imageView);
-
-        Winner winner = Game.IsOver(gameBoard);
-
-        return winner;
+        return Game.IsOver(gameBoard);
     }
 
     private static Action MiniMax_AlphaBetaPruning(State state, int depth) {
 
-        int sigma = MinValue(state, Integer.MIN_VALUE, Integer.MAX_VALUE, depth);
-
         Action action = null;
 
-        System.out.println("Sigma = " + sigma);
+        // Call MinValue with the incoming state
+        int sigma = MinValue(state, Integer.MIN_VALUE, Integer.MAX_VALUE, depth);
 
-        // Print util values
+        // Find the state's child who's utility value matches the sigma value
+        // returned from MinValue
         for (int i = 0; i < state.getNumChildArraySize(); i++) {
-            System.out.print(state.getChild(i).getUtilityValue() + " ");
-        }
-        System.out.println();
-
-        for (int i = 0; i < state.getNumChildren(); i++) {
-
             if (state.getChild(i).getUtilityValue() == sigma) {
                 action = state.getChild(i).getAction();
-
-                System.out.print("Row = " + state.getChild(i).getAction().getRow() + " Col = " + state.getChild(i).getAction().getCol() + "\n\n");
                 break;
             }
         }
 
-
+        // If there is not a child who's utility value matches sigma
+        // then return the child's action that has the smallest utility value
         if (action == null) {
             int min = Integer.MAX_VALUE;
             for (int i = 0; i < state.getNumChildArraySize(); i++) {
@@ -117,72 +104,59 @@ public class MiniMax {
 
     private static int MaxValue(State state, int alpha, int beta, int depth) {
 
+        // If the state is a finished state return its utility value
         if (Game.IsOver(state)) {
-            int blah = Game.UtilityValue(state, depth);
-            System.out.print("Util " + blah + "\n");
+            int utilityValue = Game.UtilityValue(state, depth);
             State parent = state.getParent();
             parent.done = true;
-            return blah;
+            return utilityValue;
         }
-
-        char[][] b = state.getBoardCopy();
-        System.out.print("Depth " + depth + "\n");
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                System.out.print(b[i][j] + " ");
-            }
-            System.out.println();
-        }
-        System.out.println();
 
         state.setUtilityValue(Integer.MIN_VALUE);
         ArrayList<State> children = getAllChildren(state);
 
-        for (int i = 0; i < children.size(); i++) {
+        for (State child : children) {
 
-            state.setUtilityValue(Max(state.getUtilityValue(), MinValue(children.get(i), alpha, beta, depth + 1)));
+            // Call MinValue with each child
+            state.setUtilityValue(Max(state.getUtilityValue(), MinValue(child, alpha, beta, depth + 1)));
 
+            // If the states child has reached a terminal state
+            // no need to check other children
             if (state.done) {
                 break;
             }
 
+            // Alpha Beta pruning section
+            // Stop searching children if the utility value returned from
+            // MinValue is larger than the beta value
             if (state.getUtilityValue() >= beta) {
                 return state.getUtilityValue();
             }
 
+            // set alpha to the new alpha value
             alpha = Max(alpha, state.getUtilityValue());
         }
 
+        // Return the utility value
         return state.getUtilityValue();
     }
 
     private static int MinValue(State state, int alpha, int beta, int depth) {
 
         if (Game.IsOver(state)) {
-            int blah = Game.UtilityValue(state, depth);
-            System.out.print("Util " + blah + "\n");
+            int utilityValue = Game.UtilityValue(state, depth);
             State parent = state.getParent();
             parent.done = true;
-            return blah;
+            return utilityValue;
         }
-
-        char[][] b = state.getBoardCopy();
-        System.out.print("Depth " + depth + "\n");
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                System.out.print(b[i][j] + " ");
-            }
-            System.out.println();
-        }
-        System.out.println();
 
         state.setUtilityValue(Integer.MAX_VALUE);
         ArrayList<State> children = getAllChildren(state);
 
         // Generate all children
-        for (int i = 0; i < children.size(); i++) {
+        for (State child : children) {
 
-            state.setUtilityValue(Min(state.getUtilityValue(), MaxValue(children.get(i), alpha, beta, depth + 1)));
+            state.setUtilityValue(Min(state.getUtilityValue(), MaxValue(child, alpha, beta, depth + 1)));
 
             if (state.done) {
                 break;
@@ -221,8 +195,6 @@ public class MiniMax {
         char[][] boardCopy = state.getBoardCopy();
         Action action = null;
         ArrayList<State> children = new ArrayList<>();
-        int index = 0;
-        boolean done = false;
 
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 3; col++) {
@@ -234,14 +206,14 @@ public class MiniMax {
 
                     if (state.getWhosTurn() == MiniMax.MIN) {
 
-                        boardCopy[row][col] = 'o';
-                        action.setImage('o');
+                        boardCopy[row][col] = MIN;
+                        action.setImage(MIN);
                         child = new State(boardCopy, MiniMax.MAX);
 
                     } else {
 
-                        boardCopy[row][col] = 'x';
-                        action.setImage('x');
+                        boardCopy[row][col] = MAX;
+                        action.setImage(MAX);
                         child = new State(boardCopy, MiniMax.MIN);
                     }
 
@@ -252,20 +224,10 @@ public class MiniMax {
                     children.add(child);
                     boardCopy[row][col] = 'e';
                     state.addChild(child);
-
-                    /*if (!Game.IsOver(child)) {
-                        done = true;
-                        break;
-                    }*/
                 }
             }
-
-            /*if (done) {
-                break;
-            }*/
         }
 
         return children;
     }
-
 }

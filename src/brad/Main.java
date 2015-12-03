@@ -1,9 +1,7 @@
 package brad;
 
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.concurrent.Task;
-import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.HPos;
@@ -15,7 +13,6 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
@@ -33,14 +30,13 @@ public class Main extends Application {
     private static int playerScore = 0;
     private static int cpuScore = 0;
     AnchorPane bottomAnchor;
-    private static int DEPTH = 0;
     private static AnchorPane mainAnchor;
 
 
     @Override
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("MainView.fxml"));
-        primaryStage.setTitle("Tic Tac Toe");
+        primaryStage.setTitle("Tic Tac Toe | MiniMax & Alpha Beta Pruning");
         Scene scene = new Scene(root);
         scene.getStylesheets().add("/brad/style.css");
         primaryStage.setScene(scene);
@@ -56,11 +52,12 @@ public class Main extends Application {
         bottomAnchor = (AnchorPane) root.lookup("#bottomAnchor");
 
         // Set Grid Pane Column and Row constraints
-        setGridPaneConstraines(gameBoard, mainAnchor);
+        setGridPaneConstraints(gameBoard, mainAnchor);
 
-        // Set gameBoard anchors to AnchorPane
+        // Set anchors on gameBoard so it expands and contracts with window size
         setAnchors(gameBoard);
 
+        // Build tic-tac-toe grid
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 3; col++) {
 
@@ -87,7 +84,7 @@ public class Main extends Application {
         AnchorPane.setBottomAnchor(gameBoard, 0.0);
     }
 
-    private void setGridPaneConstraines(GridPane gameBoard, AnchorPane mainAnchor) {
+    private void setGridPaneConstraints(GridPane gameBoard, AnchorPane mainAnchor) {
 
         ColumnConstraints col1 = new ColumnConstraints(10.0, mainAnchor.getWidth() / 3, Double.MAX_VALUE, Priority.ALWAYS, HPos.CENTER, true);
         ColumnConstraints col2 = new ColumnConstraints(10.0, mainAnchor.getWidth() / 3, Double.MAX_VALUE, Priority.ALWAYS, HPos.CENTER, true);
@@ -106,7 +103,7 @@ public class Main extends Application {
         Object source = event.getSource();
         GridSquare square = (GridSquare) source;
 
-        if (square.getContains() == 'e' && square.getContains() != 'o') {
+        if (square.getContains() == 'e') {
 
             square.setContains('x');
 
@@ -121,25 +118,22 @@ public class Main extends Application {
             Winner winner = Game.IsOver(gameBoard);
 
             if (!winner.getIsOver()) {
-                winner = MiniMax.Start(gameBoard, 3, PLAYER, CPU, DEPTH++);
+                winner = MiniMax.Start(gameBoard, 3, PLAYER, CPU);
                 if (winner.getIsOver()) {
                     drawRect(winner);
-                    setScoreAndReset(bottomAnchor);
+                    setScoreAndReset(bottomAnchor, winner);
                 }
             } else {
                 drawRect(winner);
-                setScoreAndReset(bottomAnchor);
+                setScoreAndReset(bottomAnchor, winner);
             }
         }
-        else
-            System.out.print("Already has an x\n");
 
     };
 
     private static void drawRect(Winner winner) {
 
         if (winner.getWhoWon() != 0) {
-            Game.WhoWon(gameBoard);
 
             if (winner.getDirection().equals(Winner.HORIZONTAL)) {
                 drawHorizontalLine(winner);
@@ -199,24 +193,20 @@ public class Main extends Application {
         }
 
         mainAnchor.getChildren().add(r);
-
-        System.out.print("\n\n**** Drew Line ****\n\n");
     }
 
-    private static void setScoreAndReset(AnchorPane bottomAnchor) {
+    private static void setScoreAndReset(AnchorPane bottomAnchor, Winner winner) {
 
-        DEPTH = 0;
         Label cpu = (Label) bottomAnchor.lookup("#cpuScore");
         Label player = (Label) bottomAnchor.lookup("#yourScore");
 
-        Winner who_won = Game.WhoWon(gameBoard);
-
-        if (who_won.getWhoWon() == 1) {
+        if (winner.getWhoWon() == 1) {
             player.setText(++playerScore + "");
-        } else if (who_won.getWhoWon() == -1) {
+        } else if (winner.getWhoWon() == -1) {
             cpu.setText(++cpuScore + "");
         }
 
+        // Start a new thread to delay 2 seconds without hanging the GUI thread
         Task<Void> sleeper = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
