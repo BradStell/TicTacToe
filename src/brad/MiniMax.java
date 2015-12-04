@@ -130,11 +130,18 @@ public class MiniMax {
             // Stop searching children if the utility value returned from
             // MinValue is larger than the beta value
             if (state.getUtilityValue() >= beta) {
+                if (depth != 0) {
+                    children.clear();
+                }
                 return state.getUtilityValue();
             }
 
             // set alpha to the new alpha value
             alpha = Max(alpha, state.getUtilityValue());
+        }
+
+        if (depth != 0) {
+            children.clear();
         }
 
         // Return the utility value
@@ -163,10 +170,17 @@ public class MiniMax {
             }
 
             if (state.getUtilityValue() <= alpha) {
+                if (depth != 0) {
+                    children.clear();
+                }
                 return state.getUtilityValue();
             }
 
             beta = Min(beta, state.getUtilityValue());
+        }
+
+        if (depth != 0) {
+            children.clear();
         }
 
         return state.getUtilityValue();
@@ -195,6 +209,7 @@ public class MiniMax {
         char[][] boardCopy = state.getBoardCopy();
         Action action = null;
         ArrayList<State> children = new ArrayList<>();
+        boolean done = false;
 
         for (int row = 0; row < size; row++) {
             for (int col = 0; col < size; col++) {
@@ -224,7 +239,15 @@ public class MiniMax {
                     children.add(child);
                     boardCopy[row][col] = 'e';
                     state.addChild(child);
+
+                    if ((Game.IsOver(child, size)).getIsOver()) {
+                        done = true;
+                        break;
+                    }
                 }
+            }
+            if (done) {
+                break;
             }
         }
 

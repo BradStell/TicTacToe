@@ -140,7 +140,7 @@ public class Game {
 
         xcount = 0;
         ocount = 0;
-        int row = 0, col = 2;
+        int row = 0, col = size - 1;
         for (int i = 0; i < size; i++) {
             if (board[row][col] == 'x') {
                 xcount++;

@@ -23,12 +23,13 @@ public class State {
 
 
     public State(char[][] board, char whosTurn, int size) {
-        copyBoard(board);
+
         this.whosTurn = whosTurn;
         numChildren = 0;
         action = new Action();
         children = new ArrayList<State>();
         this.size = size;
+        copyBoard(board);
     }
 
     private void copyBoard(char[][] board) {

@@ -135,7 +135,6 @@ public class Main extends Application {
                 setScoreAndReset(bottomAnchor, winner);
             }
         }
-
     };
 
     private final EventHandler<MouseEvent> sizeBoxClickListner = event -> {
