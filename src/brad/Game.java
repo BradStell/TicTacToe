@@ -12,7 +12,7 @@ import javafx.scene.layout.GridPane;
  */
 public class Game {
 
-    public static Winner IsOver(GridPane gameBoard, int size) {
+    public static Winner IsOver(GridPane gameBoard, int size, int depth) {
 
         char[][] boardCopy = new char[size][size];
         for (int row = 0; row < size; row++) {
@@ -21,12 +21,12 @@ public class Game {
             }
         }
 
-        return isOver(boardCopy, size);
+        return isOver(boardCopy, size, depth);
     }
 
-    private static Winner isOver(char[][] board, int size) {
+    private static Winner isOver(char[][] board, int size, int depth) {
 
-        Winner winner = whoWon(board, 0, size);
+        Winner winner = whoWon(board, depth, size);
 
         if (winner.getWhoWon() != 0) {
             winner.setIsOver(true);
@@ -46,10 +46,10 @@ public class Game {
         return winner;
     }
 
-    public static Winner IsOver(State state, int size) {
+    public static Winner IsOver(State state, int size, int depth) {
 
-        char[][] boardCopy = state.getBoardCopy();
-        return isOver(boardCopy, size);
+        char[][] boardCopy = state.getBoard();
+        return isOver(boardCopy, size, depth);
     }
 
     private static Winner whoWon(char[][] board, int depth, int size) {
@@ -75,13 +75,13 @@ public class Game {
                 winner.setWhoWon(1);
                 winner.setDirection(Winner.VERTICAL);
                 winner.setStartLine(row);
-                winner.setUtilityValue(10 - depth);
+                winner.setUtilityValue( ((size * 2) + 1) - depth);
                 return winner;
             } else if (ocount == size) {
                 winner.setWhoWon(-1);
                 winner.setDirection(Winner.VERTICAL);
                 winner.setStartLine(row);
-                winner.setUtilityValue(depth - 10);
+                winner.setUtilityValue(depth - ((size * 2) + 1));
                 return winner;
             }
         }
@@ -103,13 +103,13 @@ public class Game {
                 winner.setWhoWon(1);
                 winner.setDirection(Winner.HORIZONTAL);
                 winner.setStartLine(row);
-                winner.setUtilityValue(10 - depth);
+                winner.setUtilityValue(((size * 2) + 1) - depth);
                 return winner;
             } else if (ocount == size) {
                 winner.setWhoWon(-1);
                 winner.setDirection(Winner.HORIZONTAL);
                 winner.setStartLine(row);
-                winner.setUtilityValue(depth - 10);
+                winner.setUtilityValue(depth - ((size * 2) + 1));
                 return winner;
             }
         }
@@ -128,13 +128,13 @@ public class Game {
             winner.setWhoWon(1);
             winner.setDirection(Winner.DIAGONAL);
             winner.setStartLine(0);
-            winner.setUtilityValue(10 - depth);
+            winner.setUtilityValue(((size * 2) + 1) - depth);
             return winner;
         } else if (ocount == size) {
             winner.setWhoWon(-1);
             winner.setDirection(Winner.DIAGONAL);
             winner.setStartLine(0);
-            winner.setUtilityValue(depth - 10);
+            winner.setUtilityValue(depth - ((size * 2) + 1));
             return winner;
         }
 
@@ -153,34 +153,18 @@ public class Game {
         if (xcount == size) {
             winner.setWhoWon(1);
             winner.setDirection(Winner.DIAGONAL);
-            winner.setStartLine(2);
-            winner.setUtilityValue(10 - depth);
+            winner.setStartLine(size - 1);
+            winner.setUtilityValue(((size * 2) + 1) - depth);
             return winner;
         } else if (ocount == size) {
             winner.setWhoWon(-1);
             winner.setDirection(Winner.DIAGONAL);
-            winner.setStartLine(2);
-            winner.setUtilityValue(depth - 10);
+            winner.setStartLine(size - 1);
+            winner.setUtilityValue(depth - ((size * 2) + 1));
             return winner;
         }
 
         return winner;
-    }
-
-    public static Winner WhoWon(GridPane gameBoard, int size) {
-
-        char[][] board = new char[size][size];
-
-        // Convert gameBoard into 2D array we can work with easier
-        for (int row = 0; row < size; row++) {
-            for (int col = 0; col < size; col++) {
-                GridSquare square = (GridSquare) gameBoard.lookup("#" + row + col);
-                board[row][col] = square.getContains();
-            }
-        }
-
-        return whoWon(board, 0, size);
-
     }
 
     public static void StartOver(GridPane gameBoard, AnchorPane mainAnchor, int size) {
@@ -194,11 +178,5 @@ public class Game {
         }
 
         mainAnchor.getChildren().remove(mainAnchor.lookup("#Rectangle"));
-    }
-
-    public static Winner UtilityValue(State state, int depth, int size) {
-
-        char[][] board = state.getBoard();
-        return whoWon(board, depth, size);
     }
 }

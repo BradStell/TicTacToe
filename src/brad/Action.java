@@ -1,9 +1,10 @@
 package brad;
 
-import javafx.scene.image.Image;
 
 /**
  * Created by Brad on 11/26/2015.
+ *
+ * Represents an action or move on a tic tac toe game
  */
 public class Action {
 

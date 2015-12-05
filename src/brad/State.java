@@ -12,7 +12,7 @@ import java.util.ArrayList;
 public class State {
 
     private char[][] board;
-    private int numChildren;
+    private int numChildren = 0;
     private char whosTurn;
     private Action action;
     private int utilityValue;
@@ -20,16 +20,84 @@ public class State {
     private ArrayList<State> children;
     public boolean done = false;
     private int size;
+    private int childCount = 0;
 
 
     public State(char[][] board, char whosTurn, int size) {
 
         this.whosTurn = whosTurn;
-        numChildren = 0;
         action = new Action();
         children = new ArrayList<State>();
         this.size = size;
         copyBoard(board);
+        numChildren = calcNumChildren();
+    }
+
+    public int calcNumChildren() {
+        int count = 0;
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                if (board[i][j] == 'e') {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    public State getNextChild() {
+
+        int counter = 0;
+        boolean madeChild = false;
+        State c = null;
+        Action action = null;
+
+        for (int row = 0; row < size; row++) {
+            for (int col = 0; col < size; col++) {
+                if (board[row][col] == 'e') {
+                    if (counter == childCount) {
+
+                        //make child ####################################################
+                        action = new Action();
+
+                        if (this.getWhosTurn() == MiniMax.MIN) {
+
+                            board[row][col] = MiniMax.MIN;
+                            action.setImage(MiniMax.MIN);
+                            c = new State(board, MiniMax.MAX, size);
+
+                        } else {
+
+                            board[row][col] = MiniMax.MAX;
+                            action.setImage(MiniMax.MAX);
+                            c = new State(board, MiniMax.MIN, size);
+                        }
+
+                        action.setRow(row);
+                        action.setCol(col);
+                        c.setAction(action);
+                        c.setParent(this);
+                        children.add(c);
+                        board[row][col] = 'e';
+                        //make child ####################################################
+
+                        childCount++;
+                        madeChild = true;
+                        break;
+                    }
+                    counter++;
+                }
+            }
+            if (madeChild) {
+                break;
+            }
+        }
+
+        return c;
+    }
+
+    public void clearChildArrayList() {
+        children.clear();
     }
 
     private void copyBoard(char[][] board) {
@@ -48,11 +116,6 @@ public class State {
 
     public State getParent() {
         return parent;
-    }
-
-    public void addChild(State child) {
-        children.add(child);
-        numChildren++;
     }
 
     public int getNumChildArraySize() {
@@ -83,33 +146,8 @@ public class State {
         this.action = action;
     }
 
-    public void setNumChildren(int numChildren) {
-        this.numChildren = numChildren;
-    }
-
     public char getWhosTurn() {
         return whosTurn;
-    }
-
-    public void setWhosTurn(char whosTurn) {
-        this.whosTurn = whosTurn;
-    }
-
-    public void setBoard(char[][] board) {
-        this.board = board;
-    }
-
-    public char[][] getBoardCopy() {
-
-        char[][] stateCopy = new char[size][size];
-
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                stateCopy[i][j] = board[i][j];
-            }
-        }
-
-        return stateCopy;
     }
 
     public char[][] getBoard() {

@@ -36,6 +36,7 @@ public class Main extends Application {
     private static ComboBox comboBox;
     private static Button sizeButton;
     private static int size;
+    public static boolean IN_BACKGROUND_THREAD = false;
 
 
     @Override
@@ -107,32 +108,77 @@ public class Main extends Application {
 
     private final EventHandler<MouseEvent> myMouseHandler = event -> {
 
-        Object source = event.getSource();
-        GridSquare square = (GridSquare) source;
+        if (IN_BACKGROUND_THREAD) {
+            System.out.print("\nCPU is thinking\n");
+        } else {
 
-        if (square.getContains() == 'e') {
+            Object source = event.getSource();
+            GridSquare square = (GridSquare) source;
 
-            square.setContains('x');
+            if (square.getContains() == 'e') {
 
-            MyImageView imageView = new MyImageView();
-            imageView.setId("image");
-            imageView.setImage(X_IMAGE);
-            imageView.fitWidthProperty().bind(square.widthProperty().subtract(square.widthProperty().divide(4)));
-            imageView.fitHeightProperty().bind(square.heightProperty().subtract(square.heightProperty().divide(4)));
+                square.setContains('x');
 
-            square.getChildren().add(imageView);
+                MyImageView imageView = new MyImageView();
+                imageView.setId("image");
+                imageView.setImage(X_IMAGE);
+                imageView.fitWidthProperty().bind(square.widthProperty().subtract(square.widthProperty().divide(4)));
+                imageView.fitHeightProperty().bind(square.heightProperty().subtract(square.heightProperty().divide(4)));
 
-            Winner winner = Game.IsOver(gameBoard, size);
+                square.getChildren().add(imageView);
 
-            if (!winner.getIsOver()) {
-                winner = MiniMax.Start(gameBoard, size, PLAYER, CPU);
-                if (winner.getIsOver()) {
+                Winner winner = Game.IsOver(gameBoard, size, 0);
+
+                if (!winner.getIsOver()) {
+
+                    // Create new thread task for running algo
+                    Task<Void> gameTask = new Task<Void>() {
+
+                        Winner winner;
+
+                        @Override
+                        protected Void call() throws Exception {
+                            IN_BACKGROUND_THREAD = true;
+                            winner = MiniMax.Start(gameBoard, size, PLAYER, CPU);
+
+                            return null;
+                        }
+
+                        @Override
+                        protected void succeeded() {
+
+                            MyImageView imageView = new MyImageView();
+                            imageView.setId("image");
+
+                            if (winner.action.getImage() == MiniMax.MAX) {
+                                imageView.setImage(PLAYER);
+                                winner.gridSquare.setContains(MiniMax.MAX);
+                            } else if (winner.action.getImage() == MiniMax.MIN) {
+                                imageView.setImage(CPU);
+                                winner.gridSquare.setContains(MiniMax.MIN);
+                            }
+
+                            imageView.fitWidthProperty().bind(winner.gridSquare.widthProperty().subtract(winner.gridSquare.widthProperty().divide(4)));
+                            imageView.fitHeightProperty().bind(winner.gridSquare.heightProperty().subtract(winner.gridSquare.heightProperty().divide(4)));
+
+                            winner.gridSquare.getChildren().add(imageView);
+
+                            if (winner.getIsOver()) {
+                                drawRect(winner);
+                                setScoreAndReset(bottomAnchor, winner);
+                            }
+                            IN_BACKGROUND_THREAD = false;
+                        }
+                    };
+
+                    Thread th = new Thread(gameTask);
+                    th.setDaemon(true);
+                    th.start();
+
+                } else {
                     drawRect(winner);
                     setScoreAndReset(bottomAnchor, winner);
                 }
-            } else {
-                drawRect(winner);
-                setScoreAndReset(bottomAnchor, winner);
             }
         }
     };

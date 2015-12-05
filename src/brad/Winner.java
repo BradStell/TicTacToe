@@ -13,6 +13,8 @@ public class Winner {
     private int startLine;
     private boolean isOver;
     private int utilityValue;
+    public Action action;
+    public GridSquare gridSquare;
 
 
     public Winner() {
