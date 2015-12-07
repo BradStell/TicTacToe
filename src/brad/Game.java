@@ -17,11 +17,16 @@ public class Game {
         char[][] boardCopy = new char[size][size];
         for (int row = 0; row < size; row++) {
             for (int col = 0; col < size; col++) {
-                boardCopy[row][col] = ((GridSquare)gameBoard.lookup("#" + row + col)).getContains();
+                boardCopy[row][col] = ((GridSquare)gameBoard.lookup("#" + row + col)).contains();
             }
         }
 
         return isOver(boardCopy, size, depth);
+    }
+
+    public static Winner IsOver(State state, int size, int depth) {
+
+        return isOver(state.getBoard(), size, depth);
     }
 
     private static Winner isOver(char[][] board, int size, int depth) {
@@ -46,16 +51,9 @@ public class Game {
         return winner;
     }
 
-    public static Winner IsOver(State state, int size, int depth) {
-
-        char[][] boardCopy = state.getBoard();
-        return isOver(boardCopy, size, depth);
-    }
-
     private static Winner whoWon(char[][] board, int depth, int size) {
 
         // Check for a winner, either x's or o's
-
         int xcount;
         int ocount;
         Winner winner = new Winner();
@@ -65,11 +63,10 @@ public class Game {
             xcount = 0;
             ocount = 0;
             for (int col = 0; col < size; col++) {
-                if (board[col][row] == 'x') {
+                if (board[col][row] == 'x')
                     xcount++;
-                } else if (board[col][row] == 'o') {
+                 else if (board[col][row] == 'o')
                     ocount++;
-                }
             }
             if (xcount == size) {
                 winner.setWhoWon(1);
@@ -93,11 +90,10 @@ public class Game {
             xcount = 0;
             ocount = 0;
             for (int col = 0; col < size; col++) {
-                if (board[row][col] == 'x') {
+                if (board[row][col] == 'x')
                     xcount++;
-                } else if (board[row][col] == 'o') {
+                 else if (board[row][col] == 'o')
                     ocount++;
-                }
             }
             if (xcount == size) {
                 winner.setWhoWon(1);
@@ -114,15 +110,14 @@ public class Game {
             }
         }
 
-        // Diagonals
+        // Diagonal top left bottom right
         xcount = 0;
         ocount = 0;
         for (int row = 0; row < size; row++) {
-            if (board[row][row] == 'x') {
+            if (board[row][row] == 'x')
                 xcount++;
-            } else if (board[row][row] == 'o') {
+             else if (board[row][row] == 'o')
                 ocount++;
-            }
         }
         if (xcount == size) {
             winner.setWhoWon(1);
@@ -138,15 +133,15 @@ public class Game {
             return winner;
         }
 
+        // Diagonal top right bottom left
         xcount = 0;
         ocount = 0;
         int row = 0, col = size - 1;
         for (int i = 0; i < size; i++) {
-            if (board[row][col] == 'x') {
+            if (board[row][col] == 'x')
                 xcount++;
-            } else if (board[row][col] == 'o') {
+             else if (board[row][col] == 'o')
                 ocount++;
-            }
             row++;
             col--;
         }

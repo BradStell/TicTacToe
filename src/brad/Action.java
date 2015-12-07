@@ -10,9 +10,9 @@ public class Action {
 
     private int row;
     private int col;
-    private char image;
+    private char symbol;
 
-    public int getRow() {
+    public int row() {
         return row;
     }
 
@@ -20,7 +20,7 @@ public class Action {
         this.row = row;
     }
 
-    public int getCol() {
+    public int column() {
         return col;
     }
 
@@ -28,11 +28,11 @@ public class Action {
         this.col = col;
     }
 
-    public void setImage(char c) {
-        image = c;
+    public void setSymbol(char c) {
+        symbol = c;
     }
 
-    public char getImage() {
-        return image;
+    public char symbol() {
+        return symbol;
     }
 }

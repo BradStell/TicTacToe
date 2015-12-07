@@ -1,15 +1,129 @@
 #root {
-    -fx-base: rgb(250, 250, 250);
+    -fx-base: rgb(50, 50, 50);
+    -fx-background: rgb(50, 50, 50);
+    -fx-control-inner-background:  rgb(50, 50, 50);
+    -fx-focus-color: orangered;
+    -fx-accent: orangered;
+    -fx-outer-border: black;
+    //-fx-inner-border: grey;
+    //-fx-body-color: orangered;
 }
 
 #title {
-    -fx-font-family: 'Garamond';
-    -fx-font-size: 30px;
-    -fx-text-fill: blue;
+    //-fx-font-family: 'Garamond';
+    -fx-font-family: 'Chiller';
+    -fx-font-size: 36px;
+    -fx-text-fill: orangered;
 }
 
 .text-font {
     -fx-font-famile: 'Halvetica';
     -fx-font-size: 18px;
-    -fx-text-fill: blue;
+    -fx-text-fill: orangered;
 }
+
+.combo-box {
+    -fx-cursor: hand;
+    -fx-text-fill: gray;
+    -fx-font-famile: 'MS Reference Specialty';
+    -fx-font-size: 16px;
+
+}
+
+.button:hover {
+    -fx-background-color: -fx-shadow-highlight-color, -fx-outer-border, -fx-inner-border, -fx-body-color;
+    -fx-color: -fx-hover-base;
+    -fx-outer-border: black;
+}
+
+.button {
+    -fx-cursor: hand;
+    //-fx-background-color: linear-gradient(to top, -fx-base, derive(-fx-base,30%));
+    -fx-outer-border: black;
+    -fx-font-famile: 'MS Reference Specialty';
+    -fx-font-size: 16px;
+    -fx-text-fill: gray;
+}
+
+.label {
+    -fx-font-family: 'MS Reference Specialty';
+    -fx-font-size: 18px;
+    -fx-text-fill: gray;
+    -fx-effect: dropshadow(gaussian, black, 10, 0, 0, 0);
+}
+
+.combo-box .cell{
+    -fx-cursor: hand;
+    -fx-text-fill: gray;
+    -fx-font-famile: 'MS Reference Specialty';
+    -fx-font-size: 16px;
+}
+
+/*
+.root {
+	-fx-base: rgb(50, 50, 50);
+	-fx-background: rgb(50, 50, 50);
+	-fx-control-inner-background:  rgb(50, 50, 50);
+	-fx-focus-color: orangered;
+    -fx-focused-base: green;
+    -fx-outer-border: cyan;
+    -fx-inner-border: red;
+    -fx-body-color: blue;
+	-fx-accent: orangered;
+}
+
+.combo-box {
+    -fx-cursor: hand;
+}
+
+.text-font {
+	-fx-font-family: 'Palatino Linotype Bold';
+	-fx-font-size: 18px;
+	-fx-text-fill: orangered;
+	-fx-effect: dropshadow(gaussian, black, 10, 0, 0, 0);
+}
+
+.texttitle {
+	-fx-fill: orangered;
+	-fx-effect: innershadow(gaussian, #272121, 10, .3, 1, 1);
+	-fx-font-size: 60;
+	-fx-font-family: 'Palatino Linotype Bold Italic';
+}
+
+#singleShotCB {
+	-fx-font-family: 'Palatino Linotype Bold';
+	-fx-font-size: 18px;
+	-fx-effect: dropshadow(gaussian, black, 10, 0, 0, 0);
+    -fx-cursor: hand;
+}
+
+#loopingCB {
+	-fx-font-family: 'Palatino Linotype Bold';
+	-fx-font-size: 18px;
+	-fx-effect: dropshadow(gaussian, black, 10, 0, 0, 0);
+    -fx-cursor: hand;
+}
+
+.small-text {
+	-fx-font-family: 'Palatino Linotype';
+	-fx-font-size: 15px;
+}
+
+#rootPane {
+	-fx-background-color: radial-gradient(radius 100%, derive(-fx-base,20%), derive(-fx-base,-20%));
+}
+
+.button:hover {
+	-fx-background-color: -fx-shadow-highlight-color, -fx-outer-border, -fx-inner-border, -fx-body-color;
+	-fx-color: -fx-hover-base;
+}
+
+.hand {
+	-fx-cursor: hand;
+}
+
+.button {
+	-fx-cursor: hand;
+	-fx-background-color: linear-gradient(to top, -fx-base, derive(-fx-base,30%));
+}
+*/

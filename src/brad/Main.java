@@ -15,6 +15,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
@@ -34,7 +35,6 @@ public class Main extends Application {
     AnchorPane bottomAnchor;
     private static AnchorPane mainAnchor;
     private static ComboBox comboBox;
-    private static Button sizeButton;
     private static int size;
     public static boolean IN_BACKGROUND_THREAD = false;
 
@@ -59,7 +59,7 @@ public class Main extends Application {
         mainAnchor = (AnchorPane) root.lookup("#mainAnchor");
         bottomAnchor = (AnchorPane) root.lookup("#bottomAnchor");
         comboBox = (ComboBox) root.lookup("#sizeBox");
-        sizeButton = (Button) root.lookup("#sizeButton");
+        Button sizeButton = (Button) root.lookup("#sizeButton");
         sizeButton.setOnMouseClicked(sizeBoxClickListner);
 
         // Set Grid Pane Column and Row constraints
@@ -74,7 +74,7 @@ public class Main extends Application {
 
                 // Make a new Tic Tac Toe game square | set it to empty ('e') | make the square grow vertically
                 // and horizontally with an expanding window frame
-                GridSquare square = new GridSquare(mainAnchor.getWidth() / size, mainAnchor.getHeight() / size, gameBoard, row, col, size);
+                GridSquare square = new GridSquare(mainAnchor.getWidth() / size, mainAnchor.getHeight() / size, gameBoard, size);
                 square.setContains('e');
                 square.setId("" + row + col);
                 square.setOnMouseClicked(myMouseHandler);
@@ -106,6 +106,8 @@ public class Main extends Application {
         }
     }
 
+
+
     private final EventHandler<MouseEvent> myMouseHandler = event -> {
 
         if (IN_BACKGROUND_THREAD) {
@@ -115,23 +117,25 @@ public class Main extends Application {
             Object source = event.getSource();
             GridSquare square = (GridSquare) source;
 
-            if (square.getContains() == 'e') {
+            if (square.contains() == 'e') {
 
                 square.setContains('x');
 
-                MyImageView imageView = new MyImageView();
-                imageView.setId("image");
-                imageView.setImage(X_IMAGE);
-                imageView.fitWidthProperty().bind(square.widthProperty().subtract(square.widthProperty().divide(4)));
-                imageView.fitHeightProperty().bind(square.heightProperty().subtract(square.heightProperty().divide(4)));
-
+                MyImageView imageView = new MyImageView() {{
+                    setId("image");
+                    setImage(X_IMAGE);
+                    fitWidthProperty().bind(square.widthProperty().subtract(square.widthProperty().divide(4)));
+                    fitHeightProperty().bind(square.heightProperty().subtract(square.heightProperty().divide(4)));
+                }};
                 square.getChildren().add(imageView);
 
                 Winner winner = Game.IsOver(gameBoard, size, 0);
 
+                // If the game is not over
                 if (!winner.getIsOver()) {
 
-                    // Create new thread task for running algo
+                    // Create new task for running minimax algo
+                    // Prevents the UI thread from hanging on long processes
                     Task<Void> gameTask = new Task<Void>() {
 
                         Winner winner;
@@ -140,7 +144,6 @@ public class Main extends Application {
                         protected Void call() throws Exception {
                             IN_BACKGROUND_THREAD = true;
                             winner = MiniMax.Start(gameBoard, size, PLAYER, CPU);
-
                             return null;
                         }
 
@@ -150,10 +153,10 @@ public class Main extends Application {
                             MyImageView imageView = new MyImageView();
                             imageView.setId("image");
 
-                            if (winner.action.getImage() == MiniMax.MAX) {
+                            if (winner.action.symbol() == MiniMax.MAX) {
                                 imageView.setImage(PLAYER);
                                 winner.gridSquare.setContains(MiniMax.MAX);
-                            } else if (winner.action.getImage() == MiniMax.MIN) {
+                            } else if (winner.action.symbol() == MiniMax.MIN) {
                                 imageView.setImage(CPU);
                                 winner.gridSquare.setContains(MiniMax.MIN);
                             }
@@ -175,7 +178,7 @@ public class Main extends Application {
                     th.setDaemon(true);
                     th.start();
 
-                } else {
+                } else {    // If the game is over
                     drawRect(winner);
                     setScoreAndReset(bottomAnchor, winner);
                 }
@@ -204,7 +207,7 @@ public class Main extends Application {
 
                 // Make a new Tic Tac Toe game square | set it to empty ('e') | make the square grow vertically
                 // and horizontally with an expanding window frame
-                GridSquare square = new GridSquare(mainAnchor.getWidth() / size, mainAnchor.getHeight() / size, gameBoard, row, col, size);
+                GridSquare square = new GridSquare(mainAnchor.getWidth() / size, mainAnchor.getHeight() / size, gameBoard, size);
                 square.setContains('e');
                 square.setId("" + row + col);
                 square.setOnMouseClicked(myMouseHandler);
@@ -236,7 +239,7 @@ public class Main extends Application {
         double width = mainAnchor.getWidth() - 20;
         double height = 7;
         double startX = 10;
-        double startY = (mainAnchor.getHeight() / 6.0) + ((mainAnchor.getHeight() / size) * winner.getStartLine()) - (height /2);
+        double startY = (mainAnchor.getHeight() / (2 * size)) + ((mainAnchor.getHeight() / size) * winner.getStartLine()) - (height /2);
 
         drawLine(startX, startY, width, height, false, winner);
     }
@@ -245,7 +248,7 @@ public class Main extends Application {
 
         double width = 7;
         double height = mainAnchor.getHeight() - 20;
-        double startX = (mainAnchor.getWidth() / 6.0) + ((mainAnchor.getWidth() / size) * winner.getStartLine()) - (width /2);
+        double startX = (mainAnchor.getWidth() / (2 * size)) + ((mainAnchor.getWidth() / size) * winner.getStartLine()) - (width /2);
         double startY = 10;
 
 
@@ -257,7 +260,7 @@ public class Main extends Application {
         double width = mainAnchor.getWidth() - 20;
         double height = 7;
         double startX = 10;
-        double startY = (mainAnchor.getHeight() / 6.0) + ((mainAnchor.getHeight() / size) * 1) - (height /2);
+        double startY = (mainAnchor.getHeight() / (2 * size)) + ((mainAnchor.getHeight() / size) * 1) - (height /2);
 
         drawLine(startX, startY, width, height, true, winner);
     }
@@ -265,10 +268,12 @@ public class Main extends Application {
     private static void drawLine(double startX, double startY, double width, double height, boolean rotate, Winner winner) {
 
         Rectangle r = new Rectangle();
+        r.setId("winner-rect");
         r.setX(startX);
         r.setY(startY);
         r.setWidth(width);
         r.setHeight(height);
+        r.setFill(Color.GRAY);
         r.setId("Rectangle");
 
         if (rotate) {

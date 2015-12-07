@@ -17,7 +17,7 @@ public class GridSquare extends StackPane {
 
     private char contains;  // 'e' if empty, 'x' if x, 'o' if o
 
-    public GridSquare(double squareWidth, double squareHeight, GridPane parent, int row, int col, int size) {
+    public GridSquare(double squareWidth, double squareHeight, GridPane parent, int size) {
 
         Rectangle rect = new Rectangle(squareWidth, squareHeight);
         rect.setFill(null);
@@ -34,7 +34,7 @@ public class GridSquare extends StackPane {
         this.contains = contains;
     }
 
-    public char getContains() {
+    public char contains() {
         return contains;
     }
 

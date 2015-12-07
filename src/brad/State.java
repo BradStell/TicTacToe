@@ -45,7 +45,7 @@ public class State {
         return count;
     }
 
-    public State getNextChild() {
+    public State nextChild() {
 
         int counter = 0;
         boolean madeChild = false;
@@ -60,16 +60,16 @@ public class State {
                         //make child ####################################################
                         action = new Action();
 
-                        if (this.getWhosTurn() == MiniMax.MIN) {
+                        if (this.whosTurn() == MiniMax.MIN) {
 
                             board[row][col] = MiniMax.MIN;
-                            action.setImage(MiniMax.MIN);
+                            action.setSymbol(MiniMax.MIN);
                             c = new State(board, MiniMax.MAX, size);
 
                         } else {
 
                             board[row][col] = MiniMax.MAX;
-                            action.setImage(MiniMax.MAX);
+                            action.setSymbol(MiniMax.MAX);
                             c = new State(board, MiniMax.MIN, size);
                         }
 
@@ -96,7 +96,7 @@ public class State {
         return c;
     }
 
-    public void clearChildArrayList() {
+    public void clearChildList() {
         children.clear();
     }
 
@@ -114,11 +114,11 @@ public class State {
         this.parent = parent;
     }
 
-    public State getParent() {
+    public State parent() {
         return parent;
     }
 
-    public int getNumChildArraySize() {
+    public int numChildInList() {
         return children.size();
     }
 
@@ -126,7 +126,7 @@ public class State {
         return children.get(i);
     }
 
-    public int getUtilityValue() {
+    public int utilityValue() {
         return utilityValue;
     }
 
@@ -134,11 +134,11 @@ public class State {
         this.utilityValue = utilityValue;
     }
 
-    public int getNumChildren() {
+    public int numChildren() {
         return numChildren;
     }
 
-    public Action getAction() {
+    public Action action() {
         return action;
     }
 
@@ -146,7 +146,7 @@ public class State {
         this.action = action;
     }
 
-    public char getWhosTurn() {
+    public char whosTurn() {
         return whosTurn;
     }
 

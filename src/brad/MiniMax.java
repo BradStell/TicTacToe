@@ -33,7 +33,7 @@ public class MiniMax {
         for (int row = 0; row < size; row++) {
             for (int col = 0; col < size; col++) {
                 GridSquare square = (GridSquare) gameBoard.lookup("#" + row + col);
-                board[row][col] = square.getContains();
+                board[row][col] = square.contains();
             }
         }
 
@@ -41,20 +41,12 @@ public class MiniMax {
         State state = new State(board, MIN, size);
         Action action = MiniMax_AlphaBetaPruning(state, 0, size);
 
-        System.out.print("\n\n**** Done with algo\n\n");
-
         // Handle the action returned from the MiniMax algorithm
-        int row = action.getRow();
-        int col = action.getCol();
+        int row = action.row();
+        int col = action.column();
         GridSquare gridSquare = (GridSquare) gameBoard.lookup("#" + row + col);
 
-        if (action.getImage() == MAX) {
-            gridSquare.setContains(MAX);
-
-        } else if (action.getImage() == MIN) {
-            gridSquare.setContains(MIN);
-
-        }
+        gridSquare.setContains( (action.symbol() == MAX) ? MAX : MIN );
 
         Winner win = Game.IsOver(gameBoard, size, 0);
         win.gridSquare = gridSquare;
@@ -72,9 +64,9 @@ public class MiniMax {
 
         // Find the state's child who's utility value matches the sigma value
         // returned from MinValue
-        for (int i = 0; i < state.getNumChildArraySize(); i++) {
-            if (state.getChild(i).getUtilityValue() == sigma) {
-                action = state.getChild(i).getAction();
+        for (int i = 0; i < state.numChildInList(); i++) {
+            if (state.getChild(i).utilityValue() == sigma) {
+                action = state.getChild(i).action();
                 break;
             }
         }
@@ -83,10 +75,10 @@ public class MiniMax {
         // then return the child's action that has the smallest utility value
         if (action == null) {
             int min = Integer.MAX_VALUE;
-            for (int i = 0; i < state.getNumChildArraySize(); i++) {
-                if (state.getChild(i).getUtilityValue() < min) {
-                    min = state.getChild(i).getUtilityValue();
-                    action = state.getChild(i).getAction();
+            for (int i = 0; i < state.numChildInList(); i++) {
+                if (state.getChild(i).utilityValue() < min) {
+                    min = state.getChild(i).utilityValue();
+                    action = state.getChild(i).action();
                 }
             }
         }
@@ -96,107 +88,82 @@ public class MiniMax {
 
     private static int MaxValue(State state, int alpha, int beta, int depth, int size) {
 
-        Winner winner = Game.IsOver(state, size, depth);
-
-        // If the state is a finished state return its utility value
-        if (winner.getIsOver()) {
-            State parent = state.getParent();
-            parent.done = true;
+        // Check if terminal state
+        Winner winner;
+        if ( (winner = Game.IsOver(state, size, depth)).getIsOver()) {
+            (state.parent()).done = true;
             return winner.getUtilityValue();
         }
 
         state.setUtilityValue(Integer.MIN_VALUE);
 
-        for (int i = 0; i < state.getNumChildren(); i++) {
-
-            State child = state.getNextChild();
-
+        // For all children
+        for (int i = 0; i < state.numChildren(); i++) {
             // Call MinValue with each child
-            state.setUtilityValue(Max(state.getUtilityValue(), MinValue(child, alpha, beta, depth + 1, size)));
+            state.setUtilityValue(Max(state.utilityValue(), MinValue(state.nextChild(), alpha, beta, depth + 1, size)));
 
-            // If the states child has reached a terminal state
-            // no need to check other children
-            if (state.done) {
-                if (depth != 0) {
-                    state.clearChildArrayList();
-                }
-                break;
-            }
+            // If we are not in the top level of the tree
+            // and the child is in a terminal state, release all children from memory
+            if (state.done) break;
 
             // Alpha Beta pruning section
             // Stop searching children if the utility value returned from
             // MinValue is larger than the beta value
-            if (state.getUtilityValue() >= beta) {
-                return state.getUtilityValue();
+            if (state.utilityValue() >= beta) {
+                if (depth != 0) state.clearChildList();
+                return state.utilityValue();
             }
 
             // set alpha to the new alpha value
-            alpha = Max(alpha, state.getUtilityValue());
+            alpha = Max(alpha, state.utilityValue());
         }
 
-        if (depth != 0) {
-            state.clearChildArrayList();
-        }
+        if (depth != 0) state.clearChildList();
 
         // Return the utility value
-        return state.getUtilityValue();
+        return state.utilityValue();
     }
 
     private static int MinValue(State state, int alpha, int beta, int depth, int size) {
 
-        Winner winner = Game.IsOver(state, size, depth);
-
-        if (winner.getIsOver()) {
-            State parent = state.getParent();
-            parent.done = true;
+        // Check if terminal state
+        Winner winner;
+        if ( (winner = Game.IsOver(state, size, depth)).getIsOver()) {
+            (state.parent()).done = true;
             return winner.getUtilityValue();
         }
 
         state.setUtilityValue(Integer.MAX_VALUE);
 
-        // Generate all children
-        for (int i = 0; i < state.getNumChildren(); i++) {
+        // For all children
+        for (int i = 0; i < state.numChildren(); i++) {
 
-            State child = state.getNextChild();
+            state.setUtilityValue(Min(state.utilityValue(), MaxValue(state.nextChild(), alpha, beta, depth + 1, size)));
 
-            state.setUtilityValue(Min(state.getUtilityValue(), MaxValue(child, alpha, beta, depth + 1, size)));
+            // If we are not in the top level of the tree
+            // and the child is in a terminal state, release all children from memory
+            if (state.done) break;
 
-            if (state.done) {
-                if (depth != 0) {
-                    state.clearChildArrayList();
-                }
-                break;
+            if (state.utilityValue() <= alpha) {
+                if (depth != 0) state.clearChildList();
+                return state.utilityValue();
             }
 
-            if (state.getUtilityValue() <= alpha) {
-                return state.getUtilityValue();
-            }
-
-            beta = Min(beta, state.getUtilityValue());
+            beta = Min(beta, state.utilityValue());
         }
 
-        if (depth != 0) {
-            state.clearChildArrayList();
-        }
+        if (depth != 0) state.clearChildList();
 
-        return state.getUtilityValue();
+        return state.utilityValue();
     }
 
     private static int Max(int sigma, int minimaxValue) {
 
-        if (sigma > minimaxValue) {
-            return sigma;
-        } else {
-            return minimaxValue;
-        }
+        return (sigma > minimaxValue) ? sigma : minimaxValue;
     }
 
     private static int Min(int sigma, int minimaxValue) {
 
-        if (sigma < minimaxValue) {
-            return sigma;
-        } else {
-            return minimaxValue;
-        }
+        return (sigma < minimaxValue) ? sigma : minimaxValue;
     }
 }
