@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -25,7 +26,7 @@
                   </HBox>
                   <VBox alignment="TOP_CENTER" prefHeight="70.0" prefWidth="123.0" spacing="20.0">
                      <children>
-                        <ComboBox fx:id="sizeBox" minWidth="50" maxWidth="100" prefWidth="75.0" />
+                        <ComboBox fx:id="sizeBox" maxWidth="100" minWidth="50" prefWidth="75.0" />
                      </children>
                      <padding>
                         <Insets top="20.0" />
@@ -95,8 +96,11 @@
                   <HBox alignment="BOTTOM_RIGHT" maxHeight="Infinity" maxWidth="Infinity" prefHeight="28.0" prefWidth="724.0" spacing="10.0">
                      <children>
                         <Label text="Time" />
-                        <Label text="00 : 00 " />
+                        <Label fx:id="timer" text="00 : 00 " />
                      </children>
+                     <padding>
+                        <Insets bottom="20.0" right="20.0" />
+                     </padding>
                   </HBox>
                </children>
             </VBox>

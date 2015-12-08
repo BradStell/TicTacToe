@@ -1,7 +1,7 @@
 #root {
-    -fx-base: rgb(50, 50, 50);
-    -fx-background: rgb(50, 50, 50);
-    -fx-control-inner-background:  rgb(50, 50, 50);
+    -fx-base: rgb(100, 100, 100);
+    -fx-background: rgb(100, 100, 100);
+    -fx-control-inner-background:  rgb(100, 100, 100);
     -fx-focus-color: orangered;
     -fx-accent: orangered;
     -fx-outer-border: black;
@@ -12,7 +12,7 @@
 #title {
     //-fx-font-family: 'Garamond';
     -fx-font-family: 'Chiller';
-    -fx-font-size: 36px;
+    -fx-font-size: 50px;
     -fx-text-fill: orangered;
 }
 
@@ -24,37 +24,52 @@
 
 .combo-box {
     -fx-cursor: hand;
-    -fx-text-fill: gray;
+    -fx-text-fill: black;
     -fx-font-famile: 'MS Reference Specialty';
     -fx-font-size: 16px;
 
+    -fx-border-color: black;
+    -fx-border-radius: 0.0;
+    -fx-inner-border: black;
+    -fx-outer-border: black;
+    -fx-body-color: orangered;
+}
+
+.combo-box:hover {
+    -fx-body-color: rgb(200,0,0);
 }
 
 .button:hover {
-    -fx-background-color: -fx-shadow-highlight-color, -fx-outer-border, -fx-inner-border, -fx-body-color;
-    -fx-color: -fx-hover-base;
-    -fx-outer-border: black;
+    //-fx-background-color: -fx-shadow-highlight-color, -fx-outer-border, -fx-inner-border, -fx-body-color;
+    //-fx-color: -fx-hover-base;
+    //-fx-outer-border: black;
+    -fx-body-color: rgb(200,0,0);
 }
 
 .button {
     -fx-cursor: hand;
     //-fx-background-color: linear-gradient(to top, -fx-base, derive(-fx-base,30%));
-    -fx-outer-border: black;
+    //-fx-background-color: orangered;
+    -fx-body-color: orangered;
     -fx-font-famile: 'MS Reference Specialty';
     -fx-font-size: 16px;
-    -fx-text-fill: gray;
+    -fx-text-fill: black;
+    -fx-border-color: black;
+    -fx-border-radius: 0.0;
+    -fx-inner-border: black;
+    -fx-outer-border: black;
 }
 
 .label {
     -fx-font-family: 'MS Reference Specialty';
     -fx-font-size: 18px;
-    -fx-text-fill: gray;
+    -fx-text-fill: rgb(200, 200, 200);
     -fx-effect: dropshadow(gaussian, black, 10, 0, 0, 0);
 }
 
 .combo-box .cell{
     -fx-cursor: hand;
-    -fx-text-fill: gray;
+    -fx-text-fill: black;
     -fx-font-famile: 'MS Reference Specialty';
     -fx-font-size: 16px;
 }

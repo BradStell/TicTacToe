@@ -25,8 +25,8 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
-    private Image X_IMAGE = new Image(String.valueOf(getClass().getResource("/resources/images/x-red.png")));
-    private final Image O_IMAGE = new Image(String.valueOf(getClass().getResource("/resources/images/o-neon-green.png")));
+    private Image X_IMAGE = new Image(String.valueOf(getClass().getResource("/resources/images/x-purple.png")));
+    private final Image O_IMAGE = new Image(String.valueOf(getClass().getResource("/resources/images/o-green.png")));
     public final Image PLAYER = X_IMAGE;
     public final Image CPU = O_IMAGE;
     private static GridPane gameBoard;
@@ -124,8 +124,8 @@ public class Main extends Application {
                 MyImageView imageView = new MyImageView() {{
                     setId("image");
                     setImage(X_IMAGE);
-                    fitWidthProperty().bind(square.widthProperty().subtract(square.widthProperty().divide(4)));
-                    fitHeightProperty().bind(square.heightProperty().subtract(square.heightProperty().divide(4)));
+                    fitWidthProperty().bind(square.widthProperty()/*.subtract(square.widthProperty().divide(4))*/);
+                    fitHeightProperty().bind(square.heightProperty()/*.subtract(square.heightProperty().divide(4))*/);
                 }};
                 square.getChildren().add(imageView);
 
@@ -273,7 +273,7 @@ public class Main extends Application {
         r.setY(startY);
         r.setWidth(width);
         r.setHeight(height);
-        r.setFill(Color.GRAY);
+        r.setFill(Color.ORANGERED);
         r.setId("Rectangle");
 
         if (rotate) {
